@@ -12,6 +12,6 @@ export default function ActivityLayout() {
 
       {/* Hide the folder index route from the tab bar */}
       <TopTabs.Screen name="index" options={{ href: null }} />
-    </TopTabs>
+    </TopTabs> 
   );
 }
