@@ -1,21 +1,34 @@
-import React, { useMemo, useState } from 'react';
+import BottomSheet, { BottomSheetBackdrop, BottomSheetTextInput } from '@gorhom/bottom-sheet';
 import { Link, router } from 'expo-router';
-import { SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import React, { useMemo, useRef, useState } from 'react';
+import { SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, useWindowDimensions, View } from 'react-native';
 
 import TextCustom from '@/components/TextCustom';
 import { useAuth } from '@/context/AuthContext';
+import { account } from '@/lib/appwriteConfig';
 
 export default function Login() {
   const { signin: signIn } = useAuth();
+  const forgotSheetRef = useRef<BottomSheet>(null);
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [forgotEmail, setForgotEmail] = useState('');
+  const [forgotSubmitting, setForgotSubmitting] = useState(false);
+  const [forgotError, setForgotError] = useState<string | null>(null);
+  const [forgotSuccess, setForgotSuccess] = useState<string | null>(null);
+  const {height} = useWindowDimensions();
+  
 
   const disabled = useMemo(() => {
     return submitting || !email.trim() || !password;
   }, [email, password, submitting]);
+  const forgotDisabled = useMemo(() => {
+    return forgotSubmitting || !forgotEmail.trim();
+  }, [forgotEmail, forgotSubmitting]);
+  const forgotSnapPoints = useMemo(() => [Math.round(height * 0.35)], [height]);
 
   const handleSubmit = async () => {
     const nextEmail = email.trim().toLowerCase();
@@ -31,60 +44,147 @@ export default function Login() {
     }
   };
 
-  return (
-    <SafeAreaView style={styles.safe}>
-      <View style={styles.container}>
-        <View>
-          <TextCustom style={styles.headline} fontSize={72}>
-            Sign In
-          </TextCustom>
+  const openForgotSheet = () => {
+    const prefilledEmail = email.trim().toLowerCase();
+    setForgotEmail(prefilledEmail);
+    setForgotError(null);
+    setForgotSuccess(null);
+    // Snap imperatively to avoid strict-mode shared value warnings.
+    requestAnimationFrame(() => {
+      forgotSheetRef.current?.snapToIndex(0);
+    });
+  };
 
-          {error ? <Text style={styles.errorText}>{error}</Text> : null}
+  const handleSendRecovery = async () => {
+    const nextEmail = forgotEmail.trim().toLowerCase();
+    if (!nextEmail) return;
+
+    const recoveryUrl = process.env.EXPO_PUBLIC_APPWRITE_PASSWORD_RESET_URL;
+    if (!recoveryUrl) {
+      setForgotError('Missing EXPO_PUBLIC_APPWRITE_PASSWORD_RESET_URL in your mobile .env.');
+      return;
+    }
+
+    setForgotError(null);
+    setForgotSuccess(null);
+    setForgotSubmitting(true);
+    try {
+      await account.createRecovery(nextEmail, recoveryUrl);
+      setForgotSuccess('Check your email for a reset link.');
+    } catch (e: any) {
+      setForgotError(e?.message ?? 'Failed to send reset link. Please try again.');
+    } finally {
+      setForgotSubmitting(false);
+    }
+  };
+
+  return (
+    <View style={styles.root}>
+      <SafeAreaView style={styles.safe}>
+        <View style={styles.container}>
+          <View>
+            <TextCustom style={styles.headline} fontSize={72}>
+              Sign In
+            </TextCustom>
+
+            {error ? <Text style={styles.errorText}>{error}</Text> : null}
+
+            <TextCustom>Email</TextCustom>
+            <TextInput
+              placeholder="you@example.com"
+              style={styles.input}
+              value={email}
+              onChangeText={setEmail}
+              autoCapitalize="none"
+              autoCorrect={false}
+              keyboardType="email-address"
+            />
+
+            <TextCustom>Password</TextCustom>
+            <TextInput
+              style={styles.input}
+              placeholder="Password"
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry
+              textContentType="password"
+            />
+
+            <TouchableOpacity style={[styles.button, disabled && styles.buttonDisabled]} onPress={handleSubmit} disabled={disabled}>
+              <Text style={styles.buttonText}>{submitting ? 'Signing in…' : 'Login'}</Text>
+            </TouchableOpacity>
+
+            <View style={styles.linksRow}>
+              <Link href="/(auth)/signup" asChild>
+                <TouchableOpacity>
+                  <Text style={styles.linkText}>Create account</Text>
+                </TouchableOpacity>
+              </Link>
+              <TouchableOpacity onPress={openForgotSheet}>
+                <Text style={styles.linkText}>Forgot password?</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </SafeAreaView>
+
+      <BottomSheet
+        ref={forgotSheetRef}
+        index={-1}
+        animateOnMount={false}
+        enableDynamicSizing={false}
+        snapPoints={forgotSnapPoints}
+        enablePanDownToClose
+        style={styles.sheet}
+        backgroundStyle={styles.sheetBackground}
+        handleIndicatorStyle={styles.sheetHandle}
+        onClose={() => {
+          setForgotError(null);
+          setForgotSuccess(null);
+        }}
+        backdropComponent={(props) => (
+          <BottomSheetBackdrop
+            {...props}
+            appearsOnIndex={0}
+            disappearsOnIndex={-1}
+            pressBehavior="close"
+            opacity={0.85}
+          />
+        )}>
+        <View style={styles.sheetContent}>
+          <TextCustom style={styles.sheetTitle} fontSize={28}>
+            Forgot Password
+          </TextCustom>
+          <Text style={styles.sheetSubtitle}>Enter your email and we&apos;ll send you a reset link.</Text>
+
+          {forgotError ? <Text style={styles.errorText}>{forgotError}</Text> : null}
+          {forgotSuccess ? <Text style={styles.successText}>{forgotSuccess}</Text> : null}
 
           <TextCustom>Email</TextCustom>
-          <TextInput
+          <BottomSheetTextInput
             placeholder="you@example.com"
             style={styles.input}
-            value={email}
-            onChangeText={setEmail}
+            value={forgotEmail}
+            onChangeText={setForgotEmail}
             autoCapitalize="none"
             autoCorrect={false}
             keyboardType="email-address"
           />
 
-          <TextCustom>Password</TextCustom>
-          <TextInput
-            style={styles.input}
-            placeholder="Password"
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry
-            textContentType="password"
-          />
-
-          <TouchableOpacity style={[styles.button, disabled && styles.buttonDisabled]} onPress={handleSubmit} disabled={disabled}>
-            <Text style={styles.buttonText}>{submitting ? 'Signing in…' : 'Login'}</Text>
+          <TouchableOpacity style={[styles.button, forgotDisabled && styles.buttonDisabled]} onPress={handleSendRecovery} disabled={forgotDisabled}>
+            <Text style={styles.buttonText}>{forgotSubmitting ? 'Sending…' : 'Send reset link'}</Text>
           </TouchableOpacity>
-
-          <View style={styles.linksRow}>
-            <Link href="/(auth)/signup" asChild>
-              <TouchableOpacity>
-                <Text style={styles.linkText}>Create account</Text>
-              </TouchableOpacity>
-            </Link>
-            <Link href="/(auth)/forgot-password" asChild>
-              <TouchableOpacity>
-                <Text style={styles.linkText}>Forgot password?</Text>
-              </TouchableOpacity>
-            </Link>
-          </View>
         </View>
-      </View>
-    </SafeAreaView>
+      </BottomSheet>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
+  root: {
+    flex: 1,
+    backgroundColor: 'white',
+  },
   safe: {
     flex: 1,
     backgroundColor: 'white',
@@ -138,5 +238,37 @@ const styles = StyleSheet.create({
     textDecorationLine: 'underline',
     fontWeight: '600',
     color: '#333',
+  },
+  sheetBackground: {
+    backgroundColor: 'white',
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+  },
+  sheet: {
+    zIndex: 1000,
+    elevation: 1000,
+  },
+  sheetHandle: {
+    width: 42,
+    backgroundColor: '#C7C7CC',
+  },
+  sheetContent: {
+    paddingHorizontal: 20,
+    paddingTop: 6,
+    paddingBottom: 22,
+  },
+  sheetTitle: {
+    textAlign: 'center',
+    fontWeight: '700',
+    fontStyle: 'italic',
+  },
+  sheetSubtitle: {
+    textAlign: 'center',
+    color: '#444',
+    marginBottom: 16,
+  },
+  successText: {
+    color: '#0d7a2d',
+    marginBottom: 12,
   },
 })
