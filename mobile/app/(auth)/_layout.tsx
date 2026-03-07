@@ -18,6 +18,15 @@ export default function AuthLayout() {
     return <Redirect href="/(tabs)" />;
   }
 
-  return <Stack screenOptions={{ headerShown: false }} />;
+  return (
+    <Stack screenOptions={{ headerShown: false }}>
+      <Stack.Screen
+        name="forgot-password"
+        options={{
+          presentation: 'transparentModal',
+          animation: 'none',
+        }}
+      />
+    </Stack>
+  );
 }
-
