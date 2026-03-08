@@ -1,4 +1,5 @@
 import BottomSheet, { BottomSheetBackdrop, BottomSheetTextInput } from '@gorhom/bottom-sheet';
+import * as Linking from 'expo-linking';
 import { Link, router } from 'expo-router';
 import React, { useMemo, useRef, useState } from 'react';
 import { SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, useWindowDimensions, View } from 'react-native';
@@ -59,17 +60,20 @@ export default function Login() {
     const nextEmail = forgotEmail.trim().toLowerCase();
     if (!nextEmail) return;
 
-    const recoveryUrl = process.env.EXPO_PUBLIC_APPWRITE_PASSWORD_RESET_URL;
-    if (!recoveryUrl) {
-      setForgotError('Missing EXPO_PUBLIC_APPWRITE_PASSWORD_RESET_URL in your mobile .env.');
+    const functionBaseUrl = process.env.EXPO_PUBLIC_APPWRITE_FUNCTION_URL;
+    if (!functionBaseUrl) {
+      setForgotError('Missing EXPO_PUBLIC_APPWRITE_FUNCTION_URL in your mobile .env.');
       return;
     }
+
+    const redirectScheme = Linking.createURL('/');
+    const redirectUrl = `${functionBaseUrl}/reset-password?scheme=${encodeURIComponent(redirectScheme)}`;
 
     setForgotError(null);
     setForgotSuccess(null);
     setForgotSubmitting(true);
     try {
-      await account.createRecovery(nextEmail, recoveryUrl);
+      await account.createRecovery(nextEmail, redirectUrl);
       setForgotSuccess('Check your email for a reset link.');
     } catch (e: any) {
       setForgotError(e?.message ?? 'Failed to send reset link. Please try again.');
