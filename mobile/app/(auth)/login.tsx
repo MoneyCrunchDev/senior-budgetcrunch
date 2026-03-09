@@ -1,4 +1,5 @@
 import BottomSheet, { BottomSheetBackdrop, BottomSheetTextInput } from '@gorhom/bottom-sheet';
+import { Ionicons } from '@expo/vector-icons';
 import * as Linking from 'expo-linking';
 import { Link, router } from 'expo-router';
 import React, { useMemo, useRef, useState } from 'react';
@@ -20,6 +21,7 @@ export default function Login() {
   const [forgotSubmitting, setForgotSubmitting] = useState(false);
   const [forgotError, setForgotError] = useState<string | null>(null);
   const [forgotSuccess, setForgotSuccess] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
   const {height} = useWindowDimensions();
   
 
@@ -105,14 +107,28 @@ export default function Login() {
             />
 
             <TextCustom>Password</TextCustom>
-            <TextInput
-              style={styles.input}
-              placeholder="Password"
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry
-              textContentType="password"
-            />
+            <View style={styles.passwordRow}>
+              <TextInput
+                style={styles.passwordInput}
+                placeholder="Password"
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry={!showPassword}
+                textContentType="password"
+              />
+              <TouchableOpacity
+                style={styles.eyeButton}
+                onPress={() => setShowPassword((v) => !v)}
+                accessibilityLabel={showPassword ? 'Hide password' : 'Show password'}
+                accessibilityRole="button"
+              >
+                <Ionicons
+                  name={showPassword ? 'eye-outline' : 'eye-off-outline'}
+                  size={22}
+                  color="#666"
+                />
+              </TouchableOpacity>
+            </View>
 
             <TouchableOpacity style={[styles.button, disabled && styles.buttonDisabled]} onPress={handleSubmit} disabled={disabled}>
               <Text style={styles.buttonText}>{submitting ? 'Signing in…' : 'Login'}</Text>
@@ -194,32 +210,49 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
   },
   container: {
-    flex:1,
-    padding: 20,
+    flex: 1,
+    padding: 24,
     justifyContent: 'center',
   },
-  headline:{
-    textAlign:'center',
-    marginTop:-100,
-    marginBottom:50,
-    fontWeight:'700',
-    fontStyle:'italic'
+  headline: {
+    textAlign: 'center',
+    marginTop: -96,
+    marginBottom: 48,
+    fontWeight: '700',
+    fontStyle: 'italic',
   },
-  input:{
-    borderWidth:1,
-    borderRadius:10, 
-    padding:10,
-
-    marginTop:10,
-    marginBottom:10,
-    borderColor:"grey"
+  input: {
+    borderWidth: 1,
+    borderRadius: 8,
+    padding: 16,
+    marginTop: 8,
+    marginBottom: 8,
+    borderColor: 'grey',
+  },
+  passwordRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderRadius: 8,
+    borderColor: 'grey',
+    marginTop: 8,
+    marginBottom: 8,
+  },
+  passwordInput: {
+    flex: 1,
+    paddingVertical: 16,
+    paddingLeft: 16,
+    paddingRight: 8,
+  },
+  eyeButton: {
+    padding: 8,
   },
   button: {
     backgroundColor: 'black',
-    padding: 12,
-    borderRadius: 6,
+    padding: 16,
+    borderRadius: 8,
     alignItems: 'center',
-    marginTop:10,
+    marginTop: 16,
   },
   buttonDisabled: {
     opacity: 0.6,
@@ -231,7 +264,7 @@ const styles = StyleSheet.create({
   },
   errorText: {
     color: '#b00020',
-    marginBottom: 12,
+    marginBottom: 16,
   },
   linksRow: {
     marginTop: 16,
@@ -253,13 +286,13 @@ const styles = StyleSheet.create({
     elevation: 1000,
   },
   sheetHandle: {
-    width: 42,
+    width: 40,
     backgroundColor: '#C7C7CC',
   },
   sheetContent: {
-    paddingHorizontal: 20,
-    paddingTop: 6,
-    paddingBottom: 22,
+    paddingHorizontal: 24,
+    paddingTop: 8,
+    paddingBottom: 24,
   },
   sheetTitle: {
     textAlign: 'center',
@@ -273,6 +306,6 @@ const styles = StyleSheet.create({
   },
   successText: {
     color: '#0d7a2d',
-    marginBottom: 12,
+    marginBottom: 16,
   },
 })

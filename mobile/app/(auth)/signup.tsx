@@ -1,3 +1,4 @@
+import { Ionicons } from '@expo/vector-icons';
 import { ID } from 'react-native-appwrite';
 import { Link, router } from 'expo-router';
 import React, { useMemo, useState } from 'react';
@@ -13,6 +14,7 @@ export default function Signup() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -70,14 +72,28 @@ export default function Signup() {
         />
 
         <TextCustom>Password</TextCustom>
-        <TextInput
-          style={styles.input}
-          placeholder="At least 8 characters"
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry
-          textContentType="newPassword"
-        />
+        <View style={styles.passwordRow}>
+          <TextInput
+            style={styles.passwordInput}
+            placeholder="At least 8 characters"
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry={!showPassword}
+            textContentType="newPassword"
+          />
+          <TouchableOpacity
+            style={styles.eyeButton}
+            onPress={() => setShowPassword((v) => !v)}
+            accessibilityLabel={showPassword ? 'Hide password' : 'Show password'}
+            accessibilityRole="button"
+          >
+            <Ionicons
+              name={showPassword ? 'eye-outline' : 'eye-off-outline'}
+              size={22}
+              color="#666"
+            />
+          </TouchableOpacity>
+        </View>
 
         <TouchableOpacity style={[styles.button, disabled && styles.buttonDisabled]} onPress={handleSignup} disabled={disabled}>
           <Text style={styles.buttonText}>{submitting ? 'Creating account…' : 'Create account'}</Text>
@@ -103,30 +119,48 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    padding: 20,
+    padding: 24,
     justifyContent: 'center',
   },
   headline: {
     textAlign: 'center',
     marginTop: -80,
-    marginBottom: 30,
+    marginBottom: 32,
     fontWeight: '700',
     fontStyle: 'italic',
   },
   input: {
     borderWidth: 1,
-    borderRadius: 10,
-    padding: 10,
-    marginTop: 10,
-    marginBottom: 10,
+    borderRadius: 8,
+    padding: 16,
+    marginTop: 8,
+    marginBottom: 8,
     borderColor: 'grey',
+  },
+  passwordRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderRadius: 8,
+    borderColor: 'grey',
+    marginTop: 8,
+    marginBottom: 8,
+  },
+  passwordInput: {
+    flex: 1,
+    paddingVertical: 16,
+    paddingLeft: 16,
+    paddingRight: 8,
+  },
+  eyeButton: {
+    padding: 8,
   },
   button: {
     backgroundColor: 'black',
-    padding: 12,
-    borderRadius: 6,
+    padding: 16,
+    borderRadius: 8,
     alignItems: 'center',
-    marginTop: 10,
+    marginTop: 16,
   },
   buttonDisabled: {
     opacity: 0.6,
@@ -138,7 +172,7 @@ const styles = StyleSheet.create({
   },
   errorText: {
     color: '#b00020',
-    marginBottom: 12,
+    marginBottom: 16,
   },
   footerRow: {
     flexDirection: 'row',

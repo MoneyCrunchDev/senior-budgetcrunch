@@ -1,3 +1,4 @@
+import { Ionicons } from '@expo/vector-icons';
 import React, { useMemo, useState } from 'react';
 import { router, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
@@ -16,6 +17,8 @@ export default function ResetPassword() {
 
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -71,28 +74,56 @@ export default function ResetPassword() {
         {success ? <Text style={styles.successText}>{success}</Text> : null}
 
         <TextCustom>New Password</TextCustom>
-        <TextInput
-          style={styles.input}
-          placeholder="At least 8 characters"
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry
-          textContentType="newPassword"
-          autoCapitalize="none"
-          autoCorrect={false}
-        />
+        <View style={styles.passwordRow}>
+          <TextInput
+            style={styles.passwordInput}
+            placeholder="At least 8 characters"
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry={!showNewPassword}
+            textContentType="newPassword"
+            autoCapitalize="none"
+            autoCorrect={false}
+          />
+          <TouchableOpacity
+            style={styles.eyeButton}
+            onPress={() => setShowNewPassword((v) => !v)}
+            accessibilityLabel={showNewPassword ? 'Hide password' : 'Show password'}
+            accessibilityRole="button"
+          >
+            <Ionicons
+              name={showNewPassword ? 'eye-outline' : 'eye-off-outline'}
+              size={22}
+              color="#666"
+            />
+          </TouchableOpacity>
+        </View>
 
         <TextCustom>Confirm Password</TextCustom>
-        <TextInput
-          style={styles.input}
-          placeholder="Re-enter password"
-          value={confirmPassword}
-          onChangeText={setConfirmPassword}
-          secureTextEntry
-          textContentType="newPassword"
-          autoCapitalize="none"
-          autoCorrect={false}
-        />
+        <View style={styles.passwordRow}>
+          <TextInput
+            style={styles.passwordInput}
+            placeholder="Re-enter password"
+            value={confirmPassword}
+            onChangeText={setConfirmPassword}
+            secureTextEntry={!showConfirmPassword}
+            textContentType="newPassword"
+            autoCapitalize="none"
+            autoCorrect={false}
+          />
+          <TouchableOpacity
+            style={styles.eyeButton}
+            onPress={() => setShowConfirmPassword((v) => !v)}
+            accessibilityLabel={showConfirmPassword ? 'Hide password' : 'Show password'}
+            accessibilityRole="button"
+          >
+            <Ionicons
+              name={showConfirmPassword ? 'eye-outline' : 'eye-off-outline'}
+              size={22}
+              color="#666"
+            />
+          </TouchableOpacity>
+        </View>
 
         <TouchableOpacity
           style={[styles.button, disabled && styles.buttonDisabled]}
@@ -117,29 +148,47 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    padding: 20,
+    padding: 24,
     justifyContent: 'center',
   },
   headline: {
     textAlign: 'center',
-    marginBottom: 28,
+    marginBottom: 32,
     fontWeight: '700',
     fontStyle: 'italic',
   },
   input: {
     borderWidth: 1,
-    borderRadius: 10,
-    padding: 10,
-    marginTop: 10,
-    marginBottom: 12,
+    borderRadius: 8,
+    padding: 16,
+    marginTop: 8,
+    marginBottom: 8,
     borderColor: 'grey',
+  },
+  passwordRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderRadius: 8,
+    borderColor: 'grey',
+    marginTop: 8,
+    marginBottom: 8,
+  },
+  passwordInput: {
+    flex: 1,
+    paddingVertical: 16,
+    paddingLeft: 16,
+    paddingRight: 8,
+  },
+  eyeButton: {
+    padding: 8,
   },
   button: {
     backgroundColor: 'black',
-    padding: 12,
-    borderRadius: 6,
+    padding: 16,
+    borderRadius: 8,
     alignItems: 'center',
-    marginTop: 8,
+    marginTop: 16,
   },
   buttonDisabled: {
     opacity: 0.6,
@@ -151,11 +200,11 @@ const styles = StyleSheet.create({
   },
   errorText: {
     color: '#b00020',
-    marginBottom: 12,
+    marginBottom: 16,
   },
   successText: {
     color: '#0d7a2d',
-    marginBottom: 12,
+    marginBottom: 16,
   },
   linkWrap: {
     marginTop: 16,
