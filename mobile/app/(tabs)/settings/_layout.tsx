@@ -1,17 +1,22 @@
+import { TopTabScreenHeader } from '@/components/TopTabScreenHeader';
 import { withLayoutContext } from 'expo-router';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
+import { View } from 'react-native';
 
 const { Navigator } = createMaterialTopTabNavigator();
 const TopTabs = withLayoutContext(Navigator);
 
 export default function SettingsLayout() {
   return (
-    <TopTabs>
-      <TopTabs.Screen name="account" options={{ title: 'Account' }} />
-      <TopTabs.Screen name="app-settings" options={{ title: 'App Settings' }} />
+    <View style={{ flex: 1 }}>
+      <TopTabScreenHeader title="Settings" />
+      <TopTabs style={{ flex: 1 }}>
+        <TopTabs.Screen name="account" options={{ title: 'Account' }} />
+        <TopTabs.Screen name="app-settings" options={{ title: 'App Settings' }} />
 
-      {/* Hide the folder index route from the tab bar */}
-      <TopTabs.Screen name="index" options={{ href: null }} />
-    </TopTabs>
+        {/* Hide the folder index route from the tab bar */}
+        <TopTabs.Screen name="index" options={{ href: null }} />
+      </TopTabs>
+    </View>
   );
 }
