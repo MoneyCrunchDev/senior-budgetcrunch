@@ -73,14 +73,14 @@ export async function createLinkToken(userId: string): Promise<string> {
 }
 
 export interface ExchangeResult {
-  access_token: string;
+  ok: boolean;
   item_id: string;
 }
 
 /**
  * Exchange the one-time public_token (from Plaid Link onSuccess) for a
- * permanent access_token + item_id. Must be called immediately after Link
- * succeeds — public tokens are single-use and expire in 30 minutes.
+ * permanent access_token + item_id. The access_token is stored server-side
+ * in the plaid_items table — never returned to the device.
  */
 export async function exchangePublicToken(
   userId: string,
@@ -91,10 +91,10 @@ export async function exchangePublicToken(
     userId,
     publicToken,
   });
-  if (!data.access_token || !data.item_id) {
+  if (!data.ok || !data.item_id) {
     throw new Error(
-      (data as { error?: string }).error ?? "Exchange did not return access_token / item_id"
+      (data as { error?: string }).error ?? "Exchange failed or missing item_id"
     );
   }
-  return { access_token: data.access_token, item_id: data.item_id };
+  return { ok: data.ok, item_id: data.item_id };
 }
