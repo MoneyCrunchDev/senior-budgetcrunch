@@ -1,4 +1,5 @@
 import { Configuration, PlaidApi, PlaidEnvironments } from 'plaid';
+import { Client, Databases, ID } from 'node-appwrite';
 import { handleCreateLinkToken } from './handlers/createLinkToken.js';
 import { handleExchangePublicToken } from './handlers/exchangePublicToken.js';
 
@@ -46,5 +47,31 @@ export default async ({ req, res, log, error }) => {
 
   const plaidClient = new PlaidApi(config);
 
-  return handler({ req, res, log, error, plaidClient });
+  const APPWRITE_ENDPOINT = process.env.APPWRITE_ENDPOINT;
+  const APPWRITE_PROJECT_ID = process.env.APPWRITE_PROJECT_ID;
+  const APPWRITE_API_KEY = process.env.APPWRITE_API_KEY;
+  const APPWRITE_DATABASE_ID = process.env.APPWRITE_DATABASE_ID;
+  const APPWRITE_PLAID_ITEMS_TABLE_ID = process.env.APPWRITE_PLAID_ITEMS_TABLE_ID;
+
+  if (!APPWRITE_ENDPOINT || !APPWRITE_PROJECT_ID || !APPWRITE_API_KEY ||
+      !APPWRITE_DATABASE_ID || !APPWRITE_PLAID_ITEMS_TABLE_ID) {
+    error('Missing Appwrite env vars (ENDPOINT / PROJECT_ID / API_KEY / DATABASE_ID / PLAID_ITEMS_TABLE_ID)');
+    return res.json({ error: 'Server configuration error' }, 500);
+  }
+
+  const appwriteClient = new Client()
+    .setEndpoint(APPWRITE_ENDPOINT)
+    .setProject(APPWRITE_PROJECT_ID)
+    .setKey(APPWRITE_API_KEY);
+
+  const databases = new Databases(appwriteClient);
+
+  return handler({
+    req, res, log, error,
+    plaidClient,
+    databases,
+    databaseId: APPWRITE_DATABASE_ID,
+    tableId: APPWRITE_PLAID_ITEMS_TABLE_ID,
+    ID,
+  });
 };
