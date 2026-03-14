@@ -20,6 +20,8 @@
 // const styles = StyleSheet.create({
 //     container: { flex: 1 },
 //     map: { flex: 1 },});
+
+
 import { Text, View, SafeAreaView, StyleSheet, TouchableOpacity } from "react-native";
 import { useAuth } from "@/context/AuthContext";
 import TextCustom from "@/components/TextCustom";
