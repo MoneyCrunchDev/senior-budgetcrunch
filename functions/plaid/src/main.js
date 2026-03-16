@@ -1,11 +1,13 @@
 import { Configuration, PlaidApi, PlaidEnvironments } from 'plaid';
-import { Client, Databases, ID } from 'node-appwrite';
+import { Client, Databases, ID, Query } from 'node-appwrite';
 import { handleCreateLinkToken } from './handlers/createLinkToken.js';
 import { handleExchangePublicToken } from './handlers/exchangePublicToken.js';
+import { handleSyncTransactions } from './handlers/syncTransactions.js';
 
 const ACTIONS = {
   createLinkToken: handleCreateLinkToken,
   exchangePublicToken: handleExchangePublicToken,
+  syncTransactions: handleSyncTransactions,
 };
 
 export default async ({ req, res, log, error }) => {
@@ -73,5 +75,6 @@ export default async ({ req, res, log, error }) => {
     databaseId: APPWRITE_DATABASE_ID,
     tableId: APPWRITE_PLAID_ITEMS_TABLE_ID,
     ID,
+    Query,
   });
 };
