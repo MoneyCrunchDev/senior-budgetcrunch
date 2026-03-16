@@ -68,12 +68,15 @@ export default async ({ req, res, log, error }) => {
 
   const databases = new Databases(appwriteClient);
 
+  const APPWRITE_PLAID_TRANSACTIONS_TABLE_ID = process.env.APPWRITE_PLAID_TRANSACTIONS_TABLE_ID || null;
+
   return handler({
     req, res, log, error,
     plaidClient,
     databases,
     databaseId: APPWRITE_DATABASE_ID,
     tableId: APPWRITE_PLAID_ITEMS_TABLE_ID,
+    transactionsTableId: APPWRITE_PLAID_TRANSACTIONS_TABLE_ID,
     ID,
     Query,
   });
