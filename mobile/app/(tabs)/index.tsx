@@ -28,16 +28,10 @@ import TextCustom from "@/components/TextCustom";
 
 
 export default function Index() {
-  const { user, session, signout } = useAuth();
+  const { user, session } = useAuth();
 
   return (
     <SafeAreaView>
-          <TouchableOpacity 
-            style={styles.button} 
-            onPress={signout}
-            >
-            <Text style={styles.buttonText}>Logout</Text>
-        </TouchableOpacity>
         <View style={styles.container}>
             {/* <TextCustom fontSize={22}>Protected Routex</TextCustom> */}
             {session && user && (
@@ -49,22 +43,9 @@ export default function Index() {
 }
 
 const styles = StyleSheet.create({
-  container:{
-    paddingHorizontal:20,
-
+  container: {
+    paddingHorizontal: 20,
+    paddingTop: 80,
+    alignItems: 'center',
   },
-  headline:{
-    paddingVertical:20
-  },
-    button: {
-      backgroundColor: 'black',
-      padding: 12,
-      borderRadius: 6,
-      alignItems: 'center',
-      margin:20,
-    },
-    buttonText: {
-      color: 'white',
-      fontSize: 18,
-    },
-})
+});

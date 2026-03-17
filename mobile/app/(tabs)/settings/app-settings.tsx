@@ -7,10 +7,12 @@ import {
   TouchableOpacity,
   Switch,
 } from "react-native";
+import { useAuth } from "@/context/AuthContext";
 
 const GRID = 8;
 
 export default function Screen() {
+  const { signout } = useAuth();
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
 
   return (
@@ -39,7 +41,7 @@ export default function Screen() {
 
       {/* Logout */}
       <View style={styles.card}>
-        <TouchableOpacity style={styles.row}>
+        <TouchableOpacity style={styles.row} onPress={signout} activeOpacity={0.7}>
           <Text style={styles.logoutText}>Log Out</Text>
         </TouchableOpacity>
       </View>
