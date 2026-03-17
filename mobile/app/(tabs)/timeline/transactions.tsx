@@ -14,13 +14,8 @@ import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useAuth } from "@/context/AuthContext";
 import ModalBottomSheet from "@/components/ModalBottomSheet";
-import {
-  getLinkedItems,
-  getTransactions,
-  syncTransactions,
-  type LinkedItem,
-  type Transaction,
-} from "@/lib/plaidApi";
+import { useTransactions } from "@/context/TransactionContext";
+import { getLinkedItems, type LinkedItem, type Transaction } from "@/lib/plaidApi";
 
 const GRID = 8;
 const MONTHS = [
@@ -170,6 +165,14 @@ function groupByMonth(
 export default function TransactionsScreen() {
   const { user } = useAuth();
   const userId = user?.$id ?? null;
+  const {
+    transactions,
+    loading,
+    syncing,
+    error,
+    syncAndRefresh,
+    loadTransactions,
+  } = useTransactions();
 
   const [linkedItems, setLinkedItems] = useState<LinkedItem[]>([]);
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
@@ -180,10 +183,6 @@ export default function TransactionsScreen() {
   const [month, setMonth] = useState(now.getMonth() + 1);
   const [year, setYear] = useState(now.getFullYear());
 
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [syncing, setSyncing] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
   const [sortBy, setSortBy] = useState<SortOption>("recent");
   const [showSortPicker, setShowSortPicker] = useState(false);
@@ -207,46 +206,26 @@ export default function TransactionsScreen() {
     }
   }, [userId]);
 
-  const loadTransactions = useCallback(async () => {
-    if (!userId) {
-      setLoading(false);
-      return;
-    }
-    setLoading(true);
-    setError(null);
-    try {
-      const list = await getTransactions(userId, {
-        item_id: selectedItemId ?? undefined,
-        ...(viewAllMonths ? {} : { month, year }),
-        limit: viewAllMonths ? 500 : 200,
-      });
-      setTransactions(list);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : String(e));
-      setTransactions([]);
-    } finally {
-      setLoading(false);
-    }
-  }, [userId, selectedItemId, month, year, viewAllMonths]);
-
   useEffect(() => {
     loadLinkedItems();
   }, [loadLinkedItems]);
 
-  useEffect(() => {
-    loadTransactions();
-  }, [loadTransactions]);
-
-  const onRefresh = useCallback(async () => {
-    if (!userId) return;
-    setSyncing(true);
-    try {
-      await syncTransactions(userId);
-      await loadTransactions();
-    } finally {
-      setSyncing(false);
+  /** Filter context transactions by selected account and by month when "By month" is on. */
+  const filteredForView = useMemo(() => {
+    let list = transactions;
+    if (selectedItemId) {
+      list = list.filter((t) => t.item_id === selectedItemId);
     }
-  }, [userId, loadTransactions]);
+    if (!viewAllMonths && month != null && year != null) {
+      const start = `${year}-${String(month).padStart(2, "0")}-01`;
+      const lastDay = new Date(year, month, 0).getDate();
+      const end = `${year}-${String(month).padStart(2, "0")}-${String(lastDay).padStart(2, "0")}`;
+      list = list.filter(
+        (t) => t.date != null && t.date >= start && t.date <= end
+      );
+    }
+    return list;
+  }, [transactions, selectedItemId, viewAllMonths, month, year]);
 
   const openDetail = useCallback((t: Transaction) => {
     setSelectedTransaction(t);
@@ -286,7 +265,7 @@ export default function TransactionsScreen() {
       : "All accounts";
 
   const filteredSortedAndGrouped = useMemo(() => {
-    let list = transactions;
+    let list = filteredForView;
     const q = searchQuery.trim().toLowerCase();
     if (q) {
       list = list.filter(
@@ -297,7 +276,7 @@ export default function TransactionsScreen() {
     }
     list = sortTransactions(list, sortBy);
     return groupByMonth(list, sortBy);
-  }, [transactions, searchQuery, sortBy]);
+  }, [filteredForView, searchQuery, sortBy]);
 
   if (!userId) {
     return (
@@ -326,7 +305,7 @@ export default function TransactionsScreen() {
     <ScrollView
       contentContainerStyle={styles.container}
       refreshControl={
-        <RefreshControl refreshing={syncing} onRefresh={onRefresh} />
+        <RefreshControl refreshing={syncing} onRefresh={syncAndRefresh} />
       }
     >
       {/* 1. Account — full width, 8-grid */}

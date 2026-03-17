@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -6,14 +6,24 @@ import {
   ScrollView,
   TouchableOpacity,
   Switch,
+  ActivityIndicator,
 } from "react-native";
 import { useAuth } from "@/context/AuthContext";
+import { useTransactions } from "@/context/TransactionContext";
 
 const GRID = 8;
 
 export default function Screen() {
   const { signout } = useAuth();
+  const { syncing, syncAndRefresh } = useTransactions();
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
+  const [syncDoneShown, setSyncDoneShown] = useState(false);
+
+  useEffect(() => {
+    if (!syncDoneShown) return;
+    const t = setTimeout(() => setSyncDoneShown(false), 2000);
+    return () => clearTimeout(t);
+  }, [syncDoneShown]);
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -29,6 +39,32 @@ export default function Screen() {
             onValueChange={() => setNotificationsEnabled(!notificationsEnabled)}
           />
         </View>
+      </View>
+
+      {/* Sync transactions — backup when pull-to-refresh isn't available */}
+      <View style={styles.card}>
+        <TouchableOpacity
+          style={styles.row}
+          onPress={() => {
+            if (syncing) return;
+            setSyncDoneShown(false);
+            syncAndRefresh().then(() => setSyncDoneShown(true));
+          }}
+          disabled={syncing}
+          activeOpacity={0.7}
+        >
+          <Text
+            style={[styles.rowText, syncing && styles.syncDisabled]}
+            numberOfLines={1}
+          >
+            {syncing ? "Syncing…" : syncDoneShown ? "Done" : "Sync transactions"}
+          </Text>
+          {syncing ? (
+            <ActivityIndicator size="small" color="#666" />
+          ) : (
+            <Text style={styles.chevron}>›</Text>
+          )}
+        </TouchableOpacity>
       </View>
 
       {/* Support */}
@@ -83,6 +119,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600",
     color: "#111",
+  },
+
+  syncDisabled: {
+    color: "#999",
   },
 
   chevron: {
