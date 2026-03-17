@@ -15,7 +15,7 @@ if (token) Mapbox.setAccessToken(token);
 
 /** Fallback map center when we don't have permission or location (US center). */
 const DEFAULT_CENTER: [number, number] = [-98, 39];
-const DEFAULT_ZOOM = 14;
+const DEFAULT_ZOOM = 13;
 
 type LocationPermissionStatus = "undetermined" | "granted" | "denied";
 
@@ -76,7 +76,7 @@ export default function Index() {
           centerCoordinate={canFollowUser ? undefined : DEFAULT_CENTER}
           zoomLevel={canFollowUser ? undefined : DEFAULT_ZOOM}
           followUserLocation={canFollowUser}
-          followZoomLevel={13}
+          followZoomLevel={DEFAULT_ZOOM}
           followUserMode={Mapbox.UserTrackingMode.Follow}
         />
         {canFollowUser && <Mapbox.UserLocation />}
