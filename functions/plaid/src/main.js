@@ -3,11 +3,15 @@ import { Client, Databases, ID, Query } from 'node-appwrite';
 import { handleCreateLinkToken } from './handlers/createLinkToken.js';
 import { handleExchangePublicToken } from './handlers/exchangePublicToken.js';
 import { handleSyncTransactions } from './handlers/syncTransactions.js';
+import { handleGetLinkedItems } from './handlers/getLinkedItems.js';
+import { handleGetTransactions } from './handlers/getTransactions.js';
 
 const ACTIONS = {
   createLinkToken: handleCreateLinkToken,
   exchangePublicToken: handleExchangePublicToken,
   syncTransactions: handleSyncTransactions,
+  getLinkedItems: handleGetLinkedItems,
+  getTransactions: handleGetTransactions,
 };
 
 export default async ({ req, res, log, error }) => {
