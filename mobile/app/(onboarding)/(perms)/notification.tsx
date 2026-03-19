@@ -55,7 +55,7 @@ export default function NotificationPermissionScreen() {
   };
 
   const continueNext = () => {
-    router.replace('/(tabs)');
+    router.replace('/(onboarding)/account');
   };
 
   if (loading) {
