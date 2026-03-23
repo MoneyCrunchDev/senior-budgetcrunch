@@ -1,5 +1,6 @@
 import Mapbox from "@rnmapbox/maps";
 import * as Location from "expo-location";
+import { Ionicons } from "@expo/vector-icons";
 import { useCallback, useEffect, useState } from "react";
 import {
   View,
@@ -9,6 +10,7 @@ import {
   Linking,
   ActivityIndicator,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const token = process.env.EXPO_PUBLIC_MAPBOX_TOKEN;
 if (token) Mapbox.setAccessToken(token);
@@ -19,10 +21,16 @@ const DEFAULT_ZOOM = 13;
 
 type LocationPermissionStatus = "undetermined" | "granted" | "denied";
 
+/** Approx tab bar height so FAB sits above it (Expo tabs ~49–56). */
+const TAB_BAR_EXTRA = 8;
+
 export default function Index() {
+  const insets = useSafeAreaInsets();
   const [permissionStatus, setPermissionStatus] =
     useState<LocationPermissionStatus>("undetermined");
   const [checking, setChecking] = useState(true);
+  /** When false, user panned away; show recenter FAB. */
+  const [followingUser, setFollowingUser] = useState(true);
 
   useEffect(() => {
     let cancelled = false;
@@ -65,9 +73,25 @@ export default function Index() {
 
   const canFollowUser = permissionStatus === "granted";
 
+  /** v10: user pan/zoom/rotate sets isGestureActive — turn off follow until they tap recenter. */
+  const onCameraChanged = useCallback(
+    (state: { gestures?: { isGestureActive?: boolean } }) => {
+      if (state.gestures?.isGestureActive) {
+        setFollowingUser(false);
+      }
+    },
+    []
+  );
+
+  const recenterOnUser = useCallback(() => {
+    setFollowingUser(true);
+  }, []);
+
+  const fabBottom = insets.bottom + TAB_BAR_EXTRA + 12;
+
   return (
     <View style={styles.container}>
-      <Mapbox.MapView style={styles.map}>
+      <Mapbox.MapView style={styles.map} onCameraChanged={onCameraChanged}>
         <Mapbox.Camera
           defaultSettings={{
             centerCoordinate: DEFAULT_CENTER,
@@ -75,12 +99,24 @@ export default function Index() {
           }}
           centerCoordinate={canFollowUser ? undefined : DEFAULT_CENTER}
           zoomLevel={canFollowUser ? undefined : DEFAULT_ZOOM}
-          followUserLocation={canFollowUser}
+          followUserLocation={canFollowUser && followingUser}
           followZoomLevel={DEFAULT_ZOOM}
           followUserMode={Mapbox.UserTrackingMode.Follow}
         />
         {canFollowUser && <Mapbox.UserLocation />}
       </Mapbox.MapView>
+
+      {canFollowUser && !checking && !followingUser && (
+        <TouchableOpacity
+          style={[styles.recenterFab, { bottom: fabBottom }]}
+          onPress={recenterOnUser}
+          activeOpacity={0.85}
+          accessibilityLabel="Center map on my location"
+          accessibilityRole="button"
+        >
+          <Ionicons name="navigate-outline" size={20} color="#0A6EF2" />
+        </TouchableOpacity>
+      )}
 
       {checking && (
         <View style={styles.overlay}>
@@ -113,6 +149,23 @@ const styles = StyleSheet.create({
   },
   map: {
     flex: 1,
+  },
+  recenterFab: {
+    position: "absolute",
+    right: 16,
+    width: 40,
+    height: 40,
+    borderRadius: 26,
+    backgroundColor: "#fff",
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 4,
+    borderWidth: 1,
+    borderColor: "#E6E8EC",
   },
   overlay: {
     ...StyleSheet.absoluteFillObject,
