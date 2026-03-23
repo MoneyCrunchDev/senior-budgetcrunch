@@ -16,8 +16,8 @@ export default function SettingsLayout() {
     <View style={{ flex: 1 }}>
       <TopTabScreenHeader title="Settings" />
       <TopTabs initialRouteName="account" style={{ flex: 1 }}>
-        <TopTabs.Screen name="account" options={{ title: 'Account' }} />
-        <TopTabs.Screen name="app-settings" options={{ title: 'App Settings' }} />
+        <TopTabs.Screen name="account" options={{ title: 'ACCOUNT' }} />
+        <TopTabs.Screen name="app-settings" options={{ title: 'APP' }} />
       </TopTabs>
     </View>
   );

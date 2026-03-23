@@ -17,11 +17,12 @@ export function TopTabScreenHeader({ title }: TopTabScreenHeaderProps) {
 
 const styles = StyleSheet.create({
   header: {
-    backgroundColor: '#F6F7F9',
+    backgroundColor: 'white',
     paddingBottom: 12,
     paddingHorizontal: 16,
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: '#E0E0E0',
+    alignItems: 'center',
   },
   title: {
     fontSize: 20,

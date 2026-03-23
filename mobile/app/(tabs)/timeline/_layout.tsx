@@ -16,8 +16,8 @@ export default function TimelineLayout() {
     <View style={{ flex: 1 }}>
       <TopTabScreenHeader title="Timeline" />
       <TopTabs initialRouteName="calendar" style={{ flex: 1 }}>
-        <TopTabs.Screen name="calendar" options={{ title: 'Calendar' }} />
-        <TopTabs.Screen name="transactions" options={{ title: 'Transaction History' }} />
+        <TopTabs.Screen name="calendar" options={{ title: 'CALENDAR' }} />
+        <TopTabs.Screen name="transactions" options={{ title: 'TRANSACTIONS' }} />
       </TopTabs>
     </View>
   );

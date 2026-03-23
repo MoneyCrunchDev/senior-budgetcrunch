@@ -16,8 +16,8 @@ export default function ActivityLayout() {
     <View style={{ flex: 1 }}>
       <TopTabScreenHeader title="Activity" />
       <TopTabs initialRouteName="chart" style={{ flex: 1 }}>
-        <TopTabs.Screen name="chart" options={{ title: 'Chart' }} />
-        <TopTabs.Screen name="categories" options={{ title: 'Categories' }} />
+        <TopTabs.Screen name="chart" options={{ title: 'CHART' }} />
+        <TopTabs.Screen name="categories" options={{ title: 'CATEGORIES' }} />
       </TopTabs>
     </View>
   );
