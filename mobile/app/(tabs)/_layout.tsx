@@ -36,6 +36,7 @@ export default function TabLayout() {
   name="timeline"
   options={{
     title: 'Timeline',
+    href: '/timeline/calendar',
     tabBarIcon: ({ color, size }) => (
       <Ionicons name="calendar-outline" size={size} color={color} />
     ),
@@ -56,6 +57,7 @@ export default function TabLayout() {
   name="activity"
   options={{
     title: 'Activity',
+    href: '/activity/chart',
     tabBarIcon: ({ color, size }) => (
       <Ionicons name="stats-chart-outline" size={size} color={color} />
     ),
@@ -66,6 +68,7 @@ export default function TabLayout() {
   name="settings"
   options={{
     title: 'Settings',
+    href: '/settings/account',
     tabBarIcon: ({ color, size }) => (
       <Ionicons name="settings-outline" size={size} color={color} />
     ),
