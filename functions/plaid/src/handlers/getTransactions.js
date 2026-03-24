@@ -61,6 +61,8 @@ export async function handleGetTransactions({
       personal_finance_category: doc.personal_finance_category,
       pending: doc.pending,
       payment_channel: doc.payment_channel,
+      // JSON string from Plaid (lat/lon, city, etc.) — same shape syncTransactions saves
+      location: doc.location ?? null,
     }));
 
     log(`[getTransactions] Returning ${transactions.length} transactions for user ${userId}`);

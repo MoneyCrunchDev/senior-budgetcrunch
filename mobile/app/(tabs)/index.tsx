@@ -1,7 +1,8 @@
 import Mapbox from "@rnmapbox/maps";
+import BottomSheet from "@gorhom/bottom-sheet";
 import * as Location from "expo-location";
 import { Ionicons } from "@expo/vector-icons";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   View,
   StyleSheet,
@@ -11,6 +12,18 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import ModalBottomSheet from "@/components/ModalBottomSheet";
+import UntrackedEnvelopeSheetContent from "@/components/UntrackedEnvelopeSheetContent";
+import { useTransactions } from "@/context/TransactionContext";
+import {
+  loadEnvelopeSeenTransactionIds,
+  markEnvelopeTransactionIdsSeen,
+} from "@/lib/envelopeSeenStorage";
+import {
+  buildSpendingHeatmapGeoJson,
+  countHeatmapFeatures,
+} from "@/lib/spendingHeatmapGeoJson";
+import { filterUntrackedTransactions } from "@/lib/transactionLocation";
 
 const token = process.env.EXPO_PUBLIC_MAPBOX_TOKEN;
 if (token) Mapbox.setAccessToken(token);
@@ -24,8 +37,52 @@ type LocationPermissionStatus = "undetermined" | "granted" | "denied";
 /** Approx tab bar height so FAB sits above it (Expo tabs ~49–56). */
 const TAB_BAR_EXTRA = 8;
 
+/** Envelope FAB size; recenter stacks above with this gap. */
+const ENVELOPE_FAB_SIZE = 48;
+const FAB_STACK_GAP = 10;
+
 export default function Index() {
   const insets = useSafeAreaInsets();
+  const {
+    transactions,
+    loading: transactionsLoading,
+    syncing,
+    syncAndRefresh,
+  } = useTransactions();
+  const envelopeSheetRef = useRef<BottomSheet>(null);
+  const envelopeSnapPoints = useMemo(() => ["52%", "88%"], []);
+
+  const heatmapGeoJson = useMemo(
+    () => buildSpendingHeatmapGeoJson(transactions),
+    [transactions]
+  );
+  const heatmapPointCount = useMemo(
+    () => countHeatmapFeatures(heatmapGeoJson),
+    [heatmapGeoJson]
+  );
+
+  /** Transactions with no usable map coordinates (Sandbox often has none). */
+  const untrackedTransactions = useMemo(() => {
+    const list = filterUntrackedTransactions(transactions);
+    return [...list].sort((a, b) =>
+      (b.date ?? "").localeCompare(a.date ?? "")
+    );
+  }, [transactions]);
+
+  const [seenUntrackedIds, setSeenUntrackedIds] = useState<Set<string>>(
+    () => new Set()
+  );
+
+  useEffect(() => {
+    loadEnvelopeSeenTransactionIds().then(setSeenUntrackedIds);
+  }, []);
+
+  const hasNewUntrackedBadge = useMemo(() => {
+    return untrackedTransactions.some(
+      (t) => !seenUntrackedIds.has(t.transaction_id)
+    );
+  }, [untrackedTransactions, seenUntrackedIds]);
+
   const [permissionStatus, setPermissionStatus] =
     useState<LocationPermissionStatus>("undetermined");
   const [checking, setChecking] = useState(true);
@@ -87,7 +144,29 @@ export default function Index() {
     setFollowingUser(true);
   }, []);
 
+  const closeEnvelopeSheet = useCallback(() => {
+    envelopeSheetRef.current?.close();
+  }, []);
+
+  const openEnvelopeSheet = useCallback(async () => {
+    const ids = untrackedTransactions.map((t) => t.transaction_id);
+    await markEnvelopeTransactionIdsSeen(ids);
+    setSeenUntrackedIds((prev) => {
+      const next = new Set(prev);
+      ids.forEach((id) => next.add(id));
+      return next;
+    });
+    requestAnimationFrame(() => envelopeSheetRef.current?.snapToIndex(0));
+  }, [untrackedTransactions]);
+
+  const onMapSyncPress = useCallback(() => {
+    if (syncing) return;
+    syncAndRefresh();
+  }, [syncing, syncAndRefresh]);
+
   const fabBottom = insets.bottom + TAB_BAR_EXTRA + 12;
+  const recenterFabBottom =
+    fabBottom + ENVELOPE_FAB_SIZE + FAB_STACK_GAP;
 
   return (
     <View style={styles.container}>
@@ -103,12 +182,98 @@ export default function Index() {
           followZoomLevel={DEFAULT_ZOOM}
           followUserMode={Mapbox.UserTrackingMode.Follow}
         />
+        {heatmapPointCount > 0 && (
+          <Mapbox.ShapeSource id="spendingHeatmapSource" shape={heatmapGeoJson}>
+            <Mapbox.HeatmapLayer
+              id="spendingHeatmapLayer"
+              style={{
+                heatmapRadius: [
+                  "interpolate",
+                  ["linear"],
+                  ["zoom"],
+                  0,
+                  3,
+                  10,
+                  16,
+                  14,
+                  28,
+                ],
+                heatmapWeight: ["get", "weight"],
+                heatmapIntensity: [
+                  "interpolate",
+                  ["linear"],
+                  ["zoom"],
+                  0,
+                  0.8,
+                  14,
+                  1.2,
+                ],
+                heatmapColor: [
+                  "interpolate",
+                  ["linear"],
+                  ["heatmap-density"],
+                  0,
+                  "rgba(33, 102, 172, 0)",
+                  0.15,
+                  "rgb(103, 169, 207)",
+                  0.35,
+                  "rgb(209, 229, 240)",
+                  0.5,
+                  "rgb(253, 219, 199)",
+                  0.65,
+                  "rgb(239, 138, 98)",
+                  0.8,
+                  "rgb(215, 48, 31)",
+                  1,
+                  "rgb(165, 0, 38)",
+                ],
+                heatmapOpacity: 0.88,
+              }}
+            />
+          </Mapbox.ShapeSource>
+        )}
         {canFollowUser && <Mapbox.UserLocation />}
       </Mapbox.MapView>
 
+      {!checking && (
+        <View style={[styles.refreshFabWrap, { bottom: fabBottom }]}>
+          <TouchableOpacity
+            style={[styles.refreshFab, syncing && styles.refreshFabDisabled]}
+            onPress={onMapSyncPress}
+            disabled={syncing}
+            activeOpacity={0.85}
+            accessibilityLabel="Sync transactions and refresh map"
+            accessibilityRole="button"
+          >
+            {syncing ? (
+              <ActivityIndicator size="small" color="#0A6EF2" />
+            ) : (
+              <Ionicons name="refresh-outline" size={26} color="#0A6EF2" />
+            )}
+          </TouchableOpacity>
+        </View>
+      )}
+
+      {!checking && (
+        <View style={[styles.envelopeFabWrap, { bottom: fabBottom }]}>
+          <TouchableOpacity
+            style={styles.envelopeFab}
+            onPress={openEnvelopeSheet}
+            activeOpacity={0.85}
+            accessibilityLabel="Purchases without map location"
+            accessibilityRole="button"
+          >
+            <Ionicons name="mail-outline" size={26} color="#333" />
+            {hasNewUntrackedBadge && (
+              <View style={styles.envelopeBadge} accessibilityLabel="New items" />
+            )}
+          </TouchableOpacity>
+        </View>
+      )}
+
       {canFollowUser && !checking && !followingUser && (
         <TouchableOpacity
-          style={[styles.recenterFab, { bottom: fabBottom }]}
+          style={[styles.recenterFab, { bottom: recenterFabBottom }]}
           onPress={recenterOnUser}
           activeOpacity={0.85}
           accessibilityLabel="Center map on my location"
@@ -125,6 +290,24 @@ export default function Index() {
         </View>
       )}
 
+      {!checking &&
+        !transactionsLoading &&
+        heatmapPointCount === 0 && (
+          <View
+            style={[
+              styles.heatmapHint,
+              { top: Math.max(insets.top, 8) + 8 },
+            ]}
+            pointerEvents="none"
+          >
+            <Text style={styles.heatmapHintText}>
+              {transactions.length === 0
+                ? "No transactions loaded yet. Open Timeline and pull to sync, or use Sync transactions in Settings."
+                : "No outflow with map locations in your loaded data. Tap the envelope (bottom-right) to see purchases without coordinates — common in Sandbox."}
+            </Text>
+          </View>
+        )}
+
       {!checking && permissionStatus === "denied" && (
         <View style={styles.banner}>
           <Text style={styles.bannerText}>
@@ -139,6 +322,17 @@ export default function Index() {
           </TouchableOpacity>
         </View>
       )}
+
+      <ModalBottomSheet
+        ref={envelopeSheetRef}
+        snapPoints={envelopeSnapPoints}
+        onClose={closeEnvelopeSheet}
+      >
+        <UntrackedEnvelopeSheetContent
+          transactions={untrackedTransactions}
+          onClose={closeEnvelopeSheet}
+        />
+      </ModalBottomSheet>
     </View>
   );
 }
@@ -149,6 +343,84 @@ const styles = StyleSheet.create({
   },
   map: {
     flex: 1,
+  },
+  heatmapHint: {
+    position: "absolute",
+    left: 12,
+    right: 12,
+    backgroundColor: "rgba(255,255,255,0.94)",
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: "#E6E8EC",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.12,
+    shadowRadius: 3,
+    elevation: 3,
+  },
+  heatmapHintText: {
+    fontSize: 13,
+    color: "#333",
+    lineHeight: 18,
+    textAlign: "center",
+  },
+  refreshFabWrap: {
+    position: "absolute",
+    left: 16,
+    zIndex: 20,
+    elevation: 20,
+  },
+  refreshFab: {
+    width: ENVELOPE_FAB_SIZE,
+    height: ENVELOPE_FAB_SIZE,
+    borderRadius: ENVELOPE_FAB_SIZE / 2,
+    backgroundColor: "#fff",
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 6,
+    borderWidth: 1,
+    borderColor: "#E6E8EC",
+  },
+  refreshFabDisabled: {
+    opacity: 0.75,
+  },
+  envelopeFabWrap: {
+    position: "absolute",
+    right: 16,
+    zIndex: 20,
+    elevation: 20,
+  },
+  envelopeFab: {
+    width: ENVELOPE_FAB_SIZE,
+    height: ENVELOPE_FAB_SIZE,
+    borderRadius: ENVELOPE_FAB_SIZE / 2,
+    backgroundColor: "#fff",
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 6,
+    borderWidth: 1,
+    borderColor: "#E6E8EC",
+  },
+  envelopeBadge: {
+    position: "absolute",
+    top: 6,
+    right: 6,
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: "#E53935",
+    borderWidth: 2,
+    borderColor: "#fff",
   },
   recenterFab: {
     position: "absolute",
