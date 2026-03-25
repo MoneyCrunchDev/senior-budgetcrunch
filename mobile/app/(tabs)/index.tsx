@@ -28,6 +28,17 @@ import { filterUntrackedTransactions } from "@/lib/transactionLocation";
 const token = process.env.EXPO_PUBLIC_MAPBOX_TOKEN;
 if (token) Mapbox.setAccessToken(token);
 
+/**
+ * Basemap with strong default POI coverage (restaurants, retail, groceries, etc.).
+ * The native default is already “Street”; we pin **Streets v12** so behavior is explicit.
+ *
+ * For even more labels: duplicate **Streets** in Mapbox Studio, lower `minzoom` on
+ * `poi-label` (and related POI layers), then set `EXPO_PUBLIC_MAPBOX_STYLE_URL` to your style URL.
+ */
+const MAP_STYLE_URL =
+  process.env.EXPO_PUBLIC_MAPBOX_STYLE_URL?.trim() ||
+  "mapbox://styles/mapbox/streets-v12";
+
 /** Fallback map center when we don't have permission or location (US center). */
 const DEFAULT_CENTER: [number, number] = [-98, 39];
 const DEFAULT_ZOOM = 13;
@@ -170,7 +181,11 @@ export default function Index() {
 
   return (
     <View style={styles.container}>
-      <Mapbox.MapView style={styles.map} onCameraChanged={onCameraChanged}>
+      <Mapbox.MapView
+        style={styles.map}
+        styleURL={MAP_STYLE_URL}
+        onCameraChanged={onCameraChanged}
+      >
         <Mapbox.Camera
           defaultSettings={{
             centerCoordinate: DEFAULT_CENTER,
@@ -187,16 +202,31 @@ export default function Index() {
             <Mapbox.HeatmapLayer
               id="spendingHeatmapLayer"
               style={{
+                /**
+                 * Radius is in **screen pixels**. If it stops growing past a zoom level, the blob
+                 * looks “stuck” on the glass while the map zooms — we extend stops to ~22 so street
+                 * zoom scales up with the map (roughly constant geographic feel).
+                 */
                 heatmapRadius: [
                   "interpolate",
-                  ["linear"],
+                  ["exponential", 1.75],
                   ["zoom"],
-                  0,
                   3,
-                  10,
-                  16,
+                  2,
+                  8,
+                  6,
+                  11,
                   14,
+                  13,
                   28,
+                  15,
+                  52,
+                  17,
+                  96,
+                  19,
+                  168,
+                  21,
+                  260,
                 ],
                 heatmapWeight: ["get", "weight"],
                 heatmapIntensity: [
@@ -204,9 +234,13 @@ export default function Index() {
                   ["linear"],
                   ["zoom"],
                   0,
-                  0.8,
-                  14,
-                  1.2,
+                  0.65,
+                  11,
+                  0.9,
+                  15,
+                  1.05,
+                  19,
+                  1.15,
                 ],
                 heatmapColor: [
                   "interpolate",
@@ -227,7 +261,7 @@ export default function Index() {
                   1,
                   "rgb(165, 0, 38)",
                 ],
-                heatmapOpacity: 0.88,
+                heatmapOpacity: 0.55,
               }}
             />
           </Mapbox.ShapeSource>
@@ -279,7 +313,7 @@ export default function Index() {
           accessibilityLabel="Center map on my location"
           accessibilityRole="button"
         >
-          <Ionicons name="navigate-outline" size={20} color="#0A6EF2" />
+          <Ionicons name="navigate-outline" size={25} color="#0A6EF2" />
         </TouchableOpacity>
       )}
 
@@ -425,8 +459,8 @@ const styles = StyleSheet.create({
   recenterFab: {
     position: "absolute",
     right: 16,
-    width: 40,
-    height: 40,
+    width: 50,
+    height: 50,
     borderRadius: 26,
     backgroundColor: "#fff",
     justifyContent: "center",

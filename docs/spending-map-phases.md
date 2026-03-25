@@ -5,11 +5,17 @@ Track progress here across sessions. Full plan lives in team notes / prior spec.
 | Phase | Description | Status |
 |-------|-------------|--------|
 | **A** | Data plumbing: API returns `location`; app `Transaction` includes `location` | **Done** |
+
 | **B** | Parse lat/lon; split tracked vs untracked; outflow filter helper | **Done** |
+
 | **C** | Home map: GeoJSON + HeatmapLayer; empty copy when no points | **Done** |
+
 | **D** | Envelope FAB + bottom sheet (untracked list) | **Done** |
+
 | **E** | Red “new” badge + AsyncStorage (seen transaction ids) | **Done** |
+
 | **F** | Polish: map refresh FAB + memoized GeoJSON | **Done** |
+
 | **G** | Production parity: why KFC stayed in envelope + heatmap fix (deploy + bundle) | **Done** |
 
 ---
