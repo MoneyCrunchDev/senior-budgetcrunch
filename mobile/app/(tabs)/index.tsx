@@ -13,6 +13,7 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import ModalBottomSheet from "@/components/ModalBottomSheet";
+import MoneyPitSheetContent from "@/components/MoneyPitSheetContent";
 import UntrackedEnvelopeSheetContent from "@/components/UntrackedEnvelopeSheetContent";
 import { useTransactions } from "@/context/TransactionContext";
 import {
@@ -23,7 +24,11 @@ import {
   buildSpendingHeatmapGeoJson,
   countHeatmapFeatures,
 } from "@/lib/spendingHeatmapGeoJson";
-import { filterUntrackedTransactions } from "@/lib/transactionLocation";
+import {
+  filterUntrackedTransactions,
+  findNearbyHeatmapTransactions,
+} from "@/lib/transactionLocation";
+import type { Transaction } from "@/lib/plaidApi";
 
 const token = process.env.EXPO_PUBLIC_MAPBOX_TOKEN;
 if (token) Mapbox.setAccessToken(token);
@@ -62,6 +67,11 @@ export default function Index() {
   } = useTransactions();
   const envelopeSheetRef = useRef<BottomSheet>(null);
   const envelopeSnapPoints = useMemo(() => ["52%", "88%"], []);
+
+  const moneyPitSheetRef = useRef<BottomSheet>(null);
+  const moneyPitSnapPoints = useMemo(() => ["42%", "78%"], []);
+  const [moneyPitTransactions, setMoneyPitTransactions] = useState<Transaction[]>([]);
+  const [sheetOpen, setSheetOpen] = useState(false);
 
   const heatmapGeoJson = useMemo(
     () => buildSpendingHeatmapGeoJson(transactions),
@@ -157,6 +167,7 @@ export default function Index() {
 
   const closeEnvelopeSheet = useCallback(() => {
     envelopeSheetRef.current?.close();
+    setSheetOpen(false);
   }, []);
 
   const openEnvelopeSheet = useCallback(async () => {
@@ -167,6 +178,7 @@ export default function Index() {
       ids.forEach((id) => next.add(id));
       return next;
     });
+    setSheetOpen(true);
     requestAnimationFrame(() => envelopeSheetRef.current?.snapToIndex(0));
   }, [untrackedTransactions]);
 
@@ -174,6 +186,27 @@ export default function Index() {
     if (syncing) return;
     syncAndRefresh();
   }, [syncing, syncAndRefresh]);
+
+  const closeMoneyPitSheet = useCallback(() => {
+    moneyPitSheetRef.current?.close();
+    setSheetOpen(false);
+  }, []);
+
+  const onHeatmapPointPress = useCallback(
+    (event: { features: GeoJSON.Feature[]; coordinates: { latitude: number; longitude: number } }) => {
+      const { latitude, longitude } = event.coordinates;
+      if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) return;
+      const nearby = findNearbyHeatmapTransactions(transactions, {
+        lat: latitude,
+        lon: longitude,
+      });
+      if (nearby.length === 0) return;
+      setMoneyPitTransactions(nearby);
+      setSheetOpen(true);
+      requestAnimationFrame(() => moneyPitSheetRef.current?.snapToIndex(0));
+    },
+    [transactions]
+  );
 
   const fabBottom = insets.bottom + TAB_BAR_EXTRA + 12;
   const recenterFabBottom =
@@ -198,7 +231,12 @@ export default function Index() {
           followUserMode={Mapbox.UserTrackingMode.Follow}
         />
         {heatmapPointCount > 0 && (
-          <Mapbox.ShapeSource id="spendingHeatmapSource" shape={heatmapGeoJson}>
+          <Mapbox.ShapeSource
+            id="spendingHeatmapSource"
+            shape={heatmapGeoJson}
+            onPress={onHeatmapPointPress}
+            hitbox={{ width: 44, height: 44 }}
+          >
             <Mapbox.HeatmapLayer
               id="spendingHeatmapLayer"
               style={{
@@ -264,12 +302,19 @@ export default function Index() {
                 heatmapOpacity: 0.55,
               }}
             />
+            <Mapbox.CircleLayer
+              id="spendingHeatmapTapTarget"
+              style={{
+                circleRadius: 22,
+                circleOpacity: 0,
+              }}
+            />
           </Mapbox.ShapeSource>
         )}
         {canFollowUser && <Mapbox.UserLocation />}
       </Mapbox.MapView>
 
-      {!checking && (
+      {!checking && !sheetOpen && (
         <View style={[styles.refreshFabWrap, { bottom: fabBottom }]}>
           <TouchableOpacity
             style={[styles.refreshFab, syncing && styles.refreshFabDisabled]}
@@ -288,7 +333,7 @@ export default function Index() {
         </View>
       )}
 
-      {!checking && (
+      {!checking && !sheetOpen && (
         <View style={[styles.envelopeFabWrap, { bottom: fabBottom }]}>
           <TouchableOpacity
             style={styles.envelopeFab}
@@ -305,7 +350,7 @@ export default function Index() {
         </View>
       )}
 
-      {canFollowUser && !checking && !followingUser && (
+      {canFollowUser && !checking && !sheetOpen && !followingUser && (
         <TouchableOpacity
           style={[styles.recenterFab, { bottom: recenterFabBottom }]}
           onPress={recenterOnUser}
@@ -365,6 +410,17 @@ export default function Index() {
         <UntrackedEnvelopeSheetContent
           transactions={untrackedTransactions}
           onClose={closeEnvelopeSheet}
+        />
+      </ModalBottomSheet>
+
+      <ModalBottomSheet
+        ref={moneyPitSheetRef}
+        snapPoints={moneyPitSnapPoints}
+        onClose={closeMoneyPitSheet}
+      >
+        <MoneyPitSheetContent
+          transactions={moneyPitTransactions}
+          onClose={closeMoneyPitSheet}
         />
       </ModalBottomSheet>
     </View>
