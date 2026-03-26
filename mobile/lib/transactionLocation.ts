@@ -183,3 +183,38 @@ export function filterUntrackedTransactions(
 ): Transaction[] {
   return transactions.filter((t) => !hasValidMapLocation(t));
 }
+
+/**
+ * Approximate distance in **metres** between two WGS-84 points (Haversine).
+ * Good enough for "same block / same store" proximity checks.
+ */
+function haversineMetres(a: LatLon, b: LatLon): number {
+  const R = 6_371_000;
+  const toRad = (d: number) => (d * Math.PI) / 180;
+  const dLat = toRad(b.lat - a.lat);
+  const dLon = toRad(b.lon - a.lon);
+  const sinLat = Math.sin(dLat / 2);
+  const sinLon = Math.sin(dLon / 2);
+  const h =
+    sinLat * sinLat +
+    Math.cos(toRad(a.lat)) * Math.cos(toRad(b.lat)) * sinLon * sinLon;
+  return 2 * R * Math.asin(Math.sqrt(h));
+}
+
+/**
+ * Given a tap coordinate, return all **heatmap-eligible** (outflow + valid coords)
+ * transactions within `radiusMetres` of that point.
+ * Sorted by amount descending (biggest spends first).
+ */
+export function findNearbyHeatmapTransactions(
+  transactions: Transaction[],
+  center: LatLon,
+  radiusMetres = 250
+): Transaction[] {
+  return filterHeatmapOutflowTransactions(transactions)
+    .filter((t) => {
+      const ll = getTransactionLatLon(t);
+      return ll != null && haversineMetres(center, ll) <= radiusMetres;
+    })
+    .sort((a, b) => b.amount - a.amount);
+}
