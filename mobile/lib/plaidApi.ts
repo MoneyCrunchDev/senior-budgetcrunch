@@ -164,6 +164,11 @@ export interface Transaction {
   personal_finance_category: string | null;
   pending: boolean;
   payment_channel: string | null;
+  /**
+   * Plaid `location` payload from Appwrite, either as JSON string or parsed object.
+   * We normalize both forms in `transactionLocation.ts`.
+   */
+  location: string | Record<string, unknown> | null;
 }
 
 export type GetTransactionsOptions = {
