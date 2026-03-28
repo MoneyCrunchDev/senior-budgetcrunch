@@ -20,6 +20,39 @@ const AVG_WEEKS_PER_MONTH = 365.25 / 12 / 7;
 const MIN_ELAPSED_MS_FOR_PACE = 10 * 60 * 1000;
 /** Beyond this, show a qualitative message instead of a huge week count. */
 const MAX_PROJECTED_WEEKS_CAP = 520;
+/** Progress bar turns red if projected weeks / planned weeks ≥ this (behind by large margin). */
+const PACE_BEHIND_RED_RATIO = 1.5;
+/** Also red if projected finish is at least this many weeks later than the plan. */
+const PACE_BEHIND_RED_EXTRA_WEEKS = 12;
+
+type PaceBarTone = "green" | "yellow" | "red";
+
+const PACE_BAR_COLORS: Record<PaceBarTone, string> = {
+  green: "#2ECC71",
+  yellow: "#E6B325",
+  red: "#E53935",
+};
+
+/** Slower than planned → yellow; much slower (ratio or slip) → red. */
+function getProgressBarTone(
+  isComplete: boolean,
+  paceWeeks: number | null,
+  planWeeks: number,
+  cappedPace: boolean
+): PaceBarTone {
+  if (isComplete) return "green";
+  if (cappedPace) return "red";
+  if (paceWeeks === null || planWeeks <= 0) return "green";
+
+  if (paceWeeks <= planWeeks) return "green";
+
+  const ratio = paceWeeks / planWeeks;
+  const extraWeeks = paceWeeks - planWeeks;
+  if (ratio >= PACE_BEHIND_RED_RATIO || extraWeeks >= PACE_BEHIND_RED_EXTRA_WEEKS) {
+    return "red";
+  }
+  return "yellow";
+}
 
 type Goal = {
   id: string;
@@ -37,22 +70,49 @@ const SAMPLE_GOALS_NOW = Date.now();
 const SAMPLE_GOALS: Goal[] = [
   {
     id: "1",
-    title: "House Down Payment",
-    icon: "🏠",
-    targetAmount: 15000,
-    currentAmount: 4200,
-    weeksEstimate: 24,
-    createdAt: SAMPLE_GOALS_NOW - 10 * MS_PER_WEEK,
+    title: "School Supplies",
+    icon: "📚",
+    targetAmount: 850,
+    currentAmount: 355,
+    weeksEstimate: 3,
+    createdAt: SAMPLE_GOALS_NOW - 14 * MS_PER_DAY,
   },
   {
     id: "2",
+    title: "Turks and Caicos",
+    icon: "✈️",
+    targetAmount: 8500,
+    currentAmount: 3870,
+    weeksEstimate: 13,
+    createdAt: SAMPLE_GOALS_NOW - 10 * MS_PER_WEEK,
+  },
+  {
+    id: "3",
     title: "Anniversary Gift",
     icon: "🎁",
-    targetAmount: 250,
-    currentAmount: 90,
+    targetAmount: 3250,
+    currentAmount: 1090,
     weeksEstimate: 5,
-    createdAt: SAMPLE_GOALS_NOW - 14 * MS_PER_DAY,
+    createdAt: SAMPLE_GOALS_NOW - 10 * MS_PER_WEEK,
   },
+  {
+    id: "4",
+    title: "Renovations",
+    icon: "🛋️",
+    targetAmount: 4500,
+    currentAmount: 4500,
+    weeksEstimate: 7,
+    createdAt: SAMPLE_GOALS_NOW - 10 * MS_PER_WEEK,
+  },
+  {
+    id: "5",
+    title: "House Down Payment",
+    icon: "🏠",
+    targetAmount: 35000,
+    currentAmount: 10200,
+    weeksEstimate: 24,
+    createdAt: SAMPLE_GOALS_NOW - 10 * MS_PER_WEEK,
+  }
 ];
 
 const ICON_OPTIONS = ["🎯", "🏠", "🚗", "🎁", "✈️", "💻", "📚", "💍", "🛋️", "🎓"];
@@ -90,37 +150,96 @@ function getProjectedWeeksRemaining(goal: Goal, nowMs: number): number | null {
   return weeksLeft;
 }
 
-/** Human-readable time left at current pace (avoids "~0 weeks" for short horizons). */
-function formatPaceTimeRemaining(weeks: number): string {
-  if (!Number.isFinite(weeks) || weeks <= 0) {
+type DurationDisplayTier = "sub_day" | "days" | "weeks" | "months" | "years";
+
+/** Which unit to show (days / weeks / months / years) from a duration expressed in weeks. */
+function getDurationDisplayTier(weeks: number): DurationDisplayTier {
+  if (!Number.isFinite(weeks) || weeks <= 0) return "weeks";
+  const days = weeks * 7;
+  if (days < 1) return "sub_day";
+  if (days < 14) return "days";
+  if (weeks < 10) return "weeks";
+  if (weeks < 96) return "months";
+  return "years";
+}
+
+/** User's planned timeline (`weeksEstimate` weeks) shown in the same tier as pace for easy comparison. */
+function formatWeeksAsPlan(weeksValue: number, tier: DurationDisplayTier): string {
+  const days = weeksValue * 7;
+  if (tier === "sub_day" && days >= 1) {
+    const d = Math.max(1, Math.round(days));
+    return `~${d} day${d === 1 ? "" : "s"}`;
+  }
+
+  switch (tier) {
+    case "sub_day":
+      return "less than 1 day";
+    case "days": {
+      const d = Math.max(1, Math.round(days));
+      return `~${d} day${d === 1 ? "" : "s"}`;
+    }
+    case "weeks": {
+      const w =
+        weeksValue < 3
+          ? Math.round(weeksValue * 10) / 10
+          : Math.round(weeksValue);
+      return `${w} week${w === 1 ? "" : "s"}`;
+    }
+    case "months": {
+      const rawMonths = weeksValue / AVG_WEEKS_PER_MONTH;
+      const m =
+        rawMonths >= 10
+          ? Math.round(rawMonths)
+          : Math.round(rawMonths * 10) / 10;
+      return `~${m} month${m === 1 ? "" : "s"}`;
+    }
+    case "years": {
+      const rawY = weeksValue / 52;
+      let y = Math.round(rawY * 10) / 10;
+      if (rawY > 0 && y < 0.1) y = 0.1;
+      return `~${y} year${y === 1 ? "" : "s"}`;
+    }
+  }
+}
+
+/** Pace (weeks remaining) in the same tier as the plan line. */
+function formatWeeksAsPaceRemaining(
+  weeksValue: number,
+  tier: DurationDisplayTier
+): string {
+  if (!Number.isFinite(weeksValue) || weeksValue <= 0) {
     return "—";
   }
-
-  const days = weeks * 7;
-
-  if (days < 1) {
-    const h = Math.round(days * 24);
-    if (h < 1) return "less than 1 hour left";
-    return `~${h} hour${h === 1 ? "" : "s"} left`;
+  const days = weeksValue * 7;
+  switch (tier) {
+    case "sub_day":
+      return "less than 1 day left";
+    case "days": {
+      const d = Math.max(1, Math.round(days));
+      return `~${d} day${d === 1 ? "" : "s"} left`;
+    }
+    case "weeks": {
+      const w =
+        weeksValue < 3
+          ? Math.round(weeksValue * 10) / 10
+          : Math.round(weeksValue);
+      return `~${w} week${w === 1 ? "" : "s"} left`;
+    }
+    case "months": {
+      const rawMonths = weeksValue / AVG_WEEKS_PER_MONTH;
+      const m =
+        rawMonths >= 10
+          ? Math.round(rawMonths)
+          : Math.round(rawMonths * 10) / 10;
+      return `~${m} month${m === 1 ? "" : "s"} left`;
+    }
+    case "years": {
+      const rawY = weeksValue / 52;
+      let y = Math.round(rawY * 10) / 10;
+      if (rawY > 0 && y < 0.1) y = 0.1;
+      return `~${y} year${y === 1 ? "" : "s"} left`;
+    }
   }
-
-  if (days < 14) {
-    const d = Math.max(1, Math.round(days));
-    return `~${d} day${d === 1 ? "" : "s"} left`;
-  }
-
-  if (weeks < 10) {
-    const w = weeks < 3 ? Math.round(weeks * 10) / 10 : Math.round(weeks);
-    return `~${w} week${w === 1 ? "" : "s"} left`;
-  }
-
-  if (weeks < 96) {
-    const m = Math.round((weeks / AVG_WEEKS_PER_MONTH) * 10) / 10;
-    return `~${m} month${m === 1 ? "" : "s"} left`;
-  }
-
-  const y = Math.round((weeks / 52) * 10) / 10;
-  return `~${y} year${y === 1 ? "" : "s"} left`;
 }
 
 type GoalCardProps = {
@@ -153,6 +272,34 @@ function GoalCard({
     : null;
   const paceUiReady =
     isComplete || nowMs - goal.createdAt >= MIN_ELAPSED_MS_FOR_PACE;
+
+  const planWeeks = goal.weeksEstimate;
+  const cappedPace =
+    !isComplete &&
+    paceWeeks !== null &&
+    paceWeeks > MAX_PROJECTED_WEEKS_CAP;
+
+  let tierForEstimates: DurationDisplayTier;
+  if (!paceUiReady) {
+    tierForEstimates = getDurationDisplayTier(planWeeks);
+  } else if (isComplete) {
+    tierForEstimates = getDurationDisplayTier(planWeeks);
+  } else if (cappedPace) {
+    tierForEstimates = "years";
+  } else if (paceWeeks !== null && paceWeeks > 0) {
+    tierForEstimates = getDurationDisplayTier(paceWeeks);
+  } else {
+    tierForEstimates = getDurationDisplayTier(planWeeks);
+  }
+
+  const planEstimateLabel = formatWeeksAsPlan(planWeeks, tierForEstimates);
+
+  const progressBarTone = getProgressBarTone(
+    isComplete,
+    paceWeeks,
+    planWeeks,
+    cappedPace
+  );
 
   function handleCardPress() {
     if (deleteMode) {
@@ -223,7 +370,15 @@ function GoalCard({
 
           <View style={styles.progressWrap}>
             <View style={styles.progressTrack}>
-              <View style={[styles.progressFill, { width: `${progressPercent}%` }]} />
+              <View
+                style={[
+                  styles.progressFill,
+                  {
+                    width: `${progressPercent}%`,
+                    backgroundColor: PACE_BAR_COLORS[progressBarTone],
+                  },
+                ]}
+              />
             </View>
             <View style={styles.progressMetaRow}>
               <Text style={styles.progressLabel}>{progressPercent}% saved</Text>
@@ -237,7 +392,7 @@ function GoalCard({
         <View style={styles.expanded}>
           <View style={styles.estimateBlock}>
             <Text style={styles.weeksText}>
-              Your plan: {goal.weeksEstimate} week{goal.weeksEstimate === 1 ? "" : "s"}
+              Your plan: {planEstimateLabel}
             </Text>
             {paceUiReady &&
               (isComplete ? (
@@ -252,7 +407,8 @@ function GoalCard({
                 </Text>
               ) : paceWeeks !== null ? (
                 <Text style={styles.paceText}>
-                  At your pace: {formatPaceTimeRemaining(paceWeeks)}
+                  At your pace:{" "}
+                  {formatWeeksAsPaceRemaining(paceWeeks, tierForEstimates)}
                 </Text>
               ) : (
                 <Text style={styles.paceText}>At your pace: —</Text>
