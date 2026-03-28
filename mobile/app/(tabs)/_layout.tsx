@@ -1,6 +1,7 @@
 import { Tabs, Redirect } from 'expo-router';
 import { ActivityIndicator, SafeAreaView, Text } from 'react-native';
 import { useAuth } from '@/context/AuthContext';
+import { TransactionProvider } from '@/context/TransactionContext';
 import { Ionicons } from '@expo/vector-icons';
 
 export default function TabLayout() {
@@ -20,6 +21,7 @@ export default function TabLayout() {
   }
 
   return (
+    <TransactionProvider>
     <Tabs screenOptions={{ headerShown: false }}>
       <Tabs.Screen
   name="goals"
@@ -34,6 +36,7 @@ export default function TabLayout() {
   name="timeline"
   options={{
     title: 'Timeline',
+    href: '/timeline/calendar',
     tabBarIcon: ({ color, size }) => (
       <Ionicons name="calendar-outline" size={size} color={color} />
     ),
@@ -54,6 +57,7 @@ export default function TabLayout() {
   name="activity"
   options={{
     title: 'Activity',
+    href: '/activity/chart',
     tabBarIcon: ({ color, size }) => (
       <Ionicons name="stats-chart-outline" size={size} color={color} />
     ),
@@ -64,11 +68,13 @@ export default function TabLayout() {
   name="settings"
   options={{
     title: 'Settings',
+    href: '/settings/account',
     tabBarIcon: ({ color, size }) => (
       <Ionicons name="settings-outline" size={size} color={color} />
     ),
   }}
 />
     </Tabs>
+    </TransactionProvider>
   );
 }

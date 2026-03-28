@@ -6,16 +6,18 @@ import { View } from 'react-native';
 const { Navigator } = createMaterialTopTabNavigator();
 const TopTabs = withLayoutContext(Navigator);
 
+/** Default child for this layout (deep links / URLs with no leaf segment). */
+export const unstable_settings = {
+  initialRouteName: 'account',
+};
+
 export default function SettingsLayout() {
   return (
     <View style={{ flex: 1 }}>
       <TopTabScreenHeader title="Settings" />
-      <TopTabs style={{ flex: 1 }}>
-        <TopTabs.Screen name="account" options={{ title: 'Account' }} />
-        <TopTabs.Screen name="app-settings" options={{ title: 'App Settings' }} />
-
-        {/* Hide the folder index route from the tab bar */}
-        <TopTabs.Screen name="index" options={{ href: null }} />
+      <TopTabs initialRouteName="account" style={{ flex: 1 }}>
+        <TopTabs.Screen name="account" options={{ title: 'ACCOUNT' }} />
+        <TopTabs.Screen name="app-settings" options={{ title: 'APP' }} />
       </TopTabs>
     </View>
   );

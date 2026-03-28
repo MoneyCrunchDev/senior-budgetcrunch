@@ -1,8 +1,29 @@
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView } from "react-native";
+import { useRef, useMemo } from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  ScrollView,
+} from "react-native";
+import BottomSheet from "@gorhom/bottom-sheet";
+import { router } from "expo-router";
+import LinkedBanksSheetContent from "@/components/settings/LinkedBanksSheetContent";
+import ModalBottomSheet from "@/components/ModalBottomSheet";
 
 const GRID = 8;
 
 export default function Screen() {
+  const linkedBanksSheetRef = useRef<BottomSheet>(null);
+  const linkedBanksSnapPoints = useMemo(() => ["60%"], []);
+
+  const openLinkedBanksSheet = () => {
+    requestAnimationFrame(() => {
+      linkedBanksSheetRef.current?.snapToIndex(0);
+    });
+  };
+
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.title}>Account Settings</Text>
@@ -36,25 +57,40 @@ export default function Screen() {
         </View>
       </View>
 
+      {/* Save — scoped to Personal Information above */}
+      <TouchableOpacity style={styles.primaryButton}>
+        <Text style={styles.primaryButtonText}>Save Changes</Text>
+      </TouchableOpacity>
+
       {/* Banking */}
       <View style={styles.card}>
         <Text style={styles.cardTitle}>Banking</Text>
 
-        <TouchableOpacity style={styles.rowButton}>
-          <Text style={styles.rowButtonText}>Change Banking Information</Text>
+        <TouchableOpacity
+          style={styles.rowButton}
+          onPress={openLinkedBanksSheet}
+        >
+          <Text style={styles.rowButtonText}>View Linked Bank Info</Text>
           <Text style={styles.chevron}>›</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.rowButton}>
+        <TouchableOpacity
+          style={styles.rowButton}
+          onPress={() => router.push("/(banking)/bank-connect")}
+        >
           <Text style={styles.rowButtonText}>Add Another Bank Account</Text>
           <Text style={styles.chevron}>›</Text>
         </TouchableOpacity>
       </View>
 
-      {/* Save */}
-      <TouchableOpacity style={styles.primaryButton}>
-        <Text style={styles.primaryButtonText}>Save Changes</Text>
-      </TouchableOpacity>
+      <ModalBottomSheet
+        ref={linkedBanksSheetRef}
+        snapPoints={linkedBanksSnapPoints}
+      >
+        <LinkedBanksSheetContent
+          onClose={() => linkedBanksSheetRef.current?.close()}
+        />
+      </ModalBottomSheet>
     </ScrollView>
   );
 }
