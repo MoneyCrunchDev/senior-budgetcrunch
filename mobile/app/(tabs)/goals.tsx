@@ -12,6 +12,15 @@ import {
 
 const GRID = 8;
 
+const MS_PER_DAY = 24 * 60 * 60 * 1000;
+const MS_PER_WEEK = 7 * MS_PER_DAY;
+/** Mean Gregorian month ≈ 365.25/12 days, for pace copy only. */
+const AVG_WEEKS_PER_MONTH = 365.25 / 12 / 7;
+/** Hide pace-based estimates until this long after goal creation (stabilizes early projections). */
+const MIN_ELAPSED_MS_FOR_PACE = 10 * 60 * 1000;
+/** Beyond this, show a qualitative message instead of a huge week count. */
+const MAX_PROJECTED_WEEKS_CAP = 520;
+
 type Goal = {
   id: string;
   title: string;
@@ -19,7 +28,11 @@ type Goal = {
   targetAmount: number;
   currentAmount: number;
   weeksEstimate: number;
+  /** Unix ms when the goal was created — used for pace-based finish estimates. */
+  createdAt: number;
 };
+
+const SAMPLE_GOALS_NOW = Date.now();
 
 const SAMPLE_GOALS: Goal[] = [
   {
@@ -29,6 +42,7 @@ const SAMPLE_GOALS: Goal[] = [
     targetAmount: 15000,
     currentAmount: 4200,
     weeksEstimate: 24,
+    createdAt: SAMPLE_GOALS_NOW - 10 * MS_PER_WEEK,
   },
   {
     id: "2",
@@ -37,6 +51,7 @@ const SAMPLE_GOALS: Goal[] = [
     targetAmount: 250,
     currentAmount: 90,
     weeksEstimate: 5,
+    createdAt: SAMPLE_GOALS_NOW - 14 * MS_PER_DAY,
   },
 ];
 
@@ -51,6 +66,61 @@ function clamp01(x: number): number {
   if (x < 0) return 0;
   if (x > 1) return 1;
   return x;
+}
+
+/**
+ * Linear extrapolation: (amount saved so far) / (elapsed time) → weeks left to target.
+ * Returns null when pace cannot be computed yet.
+ */
+function getProjectedWeeksRemaining(goal: Goal, nowMs: number): number | null {
+  if (goal.currentAmount <= 0 || goal.currentAmount >= goal.targetAmount) return null;
+  const elapsed = nowMs - goal.createdAt;
+  if (elapsed < MIN_ELAPSED_MS_FOR_PACE) return null;
+
+  const elapsedWeeks = elapsed / MS_PER_WEEK;
+  if (elapsedWeeks <= 0) return null;
+
+  const amountPerWeek = goal.currentAmount / elapsedWeeks;
+  if (amountPerWeek <= 0) return null;
+
+  const remaining = goal.targetAmount - goal.currentAmount;
+  const weeksLeft = remaining / amountPerWeek;
+  if (!Number.isFinite(weeksLeft) || weeksLeft < 0) return null;
+
+  return weeksLeft;
+}
+
+/** Human-readable time left at current pace (avoids "~0 weeks" for short horizons). */
+function formatPaceTimeRemaining(weeks: number): string {
+  if (!Number.isFinite(weeks) || weeks <= 0) {
+    return "—";
+  }
+
+  const days = weeks * 7;
+
+  if (days < 1) {
+    const h = Math.round(days * 24);
+    if (h < 1) return "less than 1 hour left";
+    return `~${h} hour${h === 1 ? "" : "s"} left`;
+  }
+
+  if (days < 14) {
+    const d = Math.max(1, Math.round(days));
+    return `~${d} day${d === 1 ? "" : "s"} left`;
+  }
+
+  if (weeks < 10) {
+    const w = weeks < 3 ? Math.round(weeks * 10) / 10 : Math.round(weeks);
+    return `~${w} week${w === 1 ? "" : "s"} left`;
+  }
+
+  if (weeks < 96) {
+    const m = Math.round((weeks / AVG_WEEKS_PER_MONTH) * 10) / 10;
+    return `~${m} month${m === 1 ? "" : "s"} left`;
+  }
+
+  const y = Math.round((weeks / 52) * 10) / 10;
+  return `~${y} year${y === 1 ? "" : "s"} left`;
 }
 
 type GoalCardProps = {
@@ -76,6 +146,13 @@ function GoalCard({
   const progressPercent = Math.round(progress * 100);
   const isComplete = goal.currentAmount >= goal.targetAmount;
   const remaining = Math.max(goal.targetAmount - goal.currentAmount, 0);
+
+  const nowMs = Date.now();
+  const paceWeeks = !isComplete
+    ? getProjectedWeeksRemaining(goal, nowMs)
+    : null;
+  const paceUiReady =
+    isComplete || nowMs - goal.createdAt >= MIN_ELAPSED_MS_FOR_PACE;
 
   function handleCardPress() {
     if (deleteMode) {
@@ -104,7 +181,7 @@ function GoalCard({
         </View>
 
         <View style={styles.rowRight}>
-          {!deleteMode && (
+          {!deleteMode && !expanded && (
             <View style={styles.quickAddRow}>
               {[10, 25, 50].map((amount) => (
                 <TouchableOpacity
@@ -158,27 +235,28 @@ function GoalCard({
 
       {expanded && !deleteMode && (
         <View style={styles.expanded}>
-          <View style={styles.expandedHeader}>
-            <View style={styles.expandedHeaderLeft}>
-              <View style={styles.iconCircleSm}>
-                <Text style={styles.iconText}>{goal.icon}</Text>
-              </View>
-              <Text style={styles.expandedTitle} numberOfLines={1}>
-                {goal.title}
-              </Text>
-            </View>
-
-            <Text style={styles.weeksText}>{goal.weeksEstimate} weeks</Text>
-          </View>
-
-          <View style={styles.amountRow}>
-            <Text style={styles.amountLabel}>Goal Amount:</Text>
-            <Text style={styles.amountValue}>{formatMoney(goal.targetAmount)}</Text>
-          </View>
-
-          <View style={styles.amountRow}>
-            <Text style={styles.amountLabel}>Saved So Far:</Text>
-            <Text style={styles.amountValue}>{formatMoney(goal.currentAmount)}</Text>
+          <View style={styles.estimateBlock}>
+            <Text style={styles.weeksText}>
+              Your plan: {goal.weeksEstimate} week{goal.weeksEstimate === 1 ? "" : "s"}
+            </Text>
+            {paceUiReady &&
+              (isComplete ? (
+                <Text style={styles.paceText}>At your pace: complete</Text>
+              ) : goal.currentAmount <= 0 ? (
+                <Text style={styles.paceText}>
+                  At your pace: add savings to project a finish time
+                </Text>
+              ) : paceWeeks !== null && paceWeeks > MAX_PROJECTED_WEEKS_CAP ? (
+                <Text style={styles.paceText}>
+                  At your pace: 10+ years at this rate — try saving more per week
+                </Text>
+              ) : paceWeeks !== null ? (
+                <Text style={styles.paceText}>
+                  At your pace: {formatPaceTimeRemaining(paceWeeks)}
+                </Text>
+              ) : (
+                <Text style={styles.paceText}>At your pace: —</Text>
+              ))}
           </View>
 
           <View style={styles.addGrid}>
@@ -353,6 +431,7 @@ export default function Screen() {
       targetAmount: target,
       currentAmount: 0,
       weeksEstimate: weeks,
+      createdAt: Date.now(),
     };
 
     setGoals((prev) => [createdGoal, ...prev]);
@@ -753,15 +832,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
 
-  iconCircleSm: {
-    width: GRID * 4,
-    height: GRID * 4,
-    borderRadius: GRID * 2,
-    backgroundColor: "#F2F4F7",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-
   iconText: {
     fontSize: 18,
   },
@@ -840,31 +910,19 @@ const styles = StyleSheet.create({
     gap: GRID * 2,
   },
 
-  expandedHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    gap: GRID * 2,
-  },
-
-  expandedHeaderLeft: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: GRID * 1.5,
-    flex: 1,
-    minWidth: 0,
-  },
-
-  expandedTitle: {
-    fontSize: 16,
-    fontWeight: "900",
-    color: "#111",
-    flex: 1,
+  estimateBlock: {
+    gap: GRID / 2,
   },
 
   weeksText: {
     fontSize: 12,
     fontWeight: "800",
+    color: "#6B7280",
+  },
+
+  paceText: {
+    fontSize: 12,
+    fontWeight: "600",
     color: "#6B7280",
   },
 
@@ -908,25 +966,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: "800",
     color: "#6B7280",
-  },
-
-  amountRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    gap: GRID,
-  },
-
-  amountLabel: {
-    fontSize: 14,
-    fontWeight: "700",
-    color: "#111",
-  },
-
-  amountValue: {
-    fontSize: 14,
-    fontWeight: "900",
-    color: "#111",
   },
 
   addGrid: {
