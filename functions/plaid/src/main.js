@@ -5,6 +5,7 @@ import { handleExchangePublicToken } from './handlers/exchangePublicToken.js';
 import { handleSyncTransactions } from './handlers/syncTransactions.js';
 import { handleGetLinkedItems } from './handlers/getLinkedItems.js';
 import { handleGetTransactions } from './handlers/getTransactions.js';
+// Back-fill sandbox transaction coordinates in Appwrite (see handler file for why).
 import { handlePatchSandboxLocations } from './handlers/patchSandboxLocations.js';
 
 const ACTIONS = {
