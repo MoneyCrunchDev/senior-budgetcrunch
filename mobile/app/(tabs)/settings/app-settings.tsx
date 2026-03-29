@@ -30,7 +30,7 @@ export default function Screen() {
       <Text style={styles.title}>App Settings</Text>
 
       {/* Notifications */}
-      <View style={styles.card}>
+      {/* <View style={styles.card}>
         <View style={styles.row}>
           <Text style={styles.rowText}>Notifications</Text>
 
@@ -39,7 +39,7 @@ export default function Screen() {
             onValueChange={() => setNotificationsEnabled(!notificationsEnabled)}
           />
         </View>
-      </View>
+      </View> */}
 
       {/* Sync transactions — backup when pull-to-refresh isn't available */}
       <View style={styles.card}>
@@ -68,12 +68,12 @@ export default function Screen() {
       </View>
 
       {/* Support */}
-      <View style={styles.card}>
+      {/* <View style={styles.card}>
         <TouchableOpacity style={styles.row}>
           <Text style={styles.rowText}>Contact Support</Text>
           <Text style={styles.chevron}>›</Text>
         </TouchableOpacity>
-      </View>
+      </View> */}
 
       {/* Logout */}
       <View style={styles.card}>
