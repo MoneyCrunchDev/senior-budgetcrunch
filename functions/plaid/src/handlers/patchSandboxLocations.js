@@ -1,12 +1,18 @@
 /**
- * One-shot handler to back-fill location data on sandbox transactions.
+ * HTTP handler (Plaid function action `patchSandboxLocations`): back-fill location data
+ * on sandbox transactions stored in Appwrite for a given `userId`.
  *
- * Plaid's custom-user override schema does not include a `location` field,
- * so all sandbox transactions arrive with null coordinates. This handler
- * matches each transaction's `name` against a merchant→location map and
- * writes the correct Plaid-shaped location JSON into Appwrite.
+ * Why: Plaid’s sandbox / custom-user payloads do not populate `location`, so synced
+ * transactions would have no coordinates for the map. This handler matches each row’s
+ * `name` / `merchant_name` to `LOCATION_MAP` / `ALIAS_MAP` and writes Plaid-shaped
+ * location JSON onto the document.
  *
- * Idempotent: skips rows that already contain non-null lat/lon.
+ * Partners: call with `{ action: "patchSandboxLocations", userId: "<appwrite user id>" }`
+ * after syncing sandbox transactions — same logic applies to any test user, not only one
+ * account. Keep lat/lon in sync with `sandbox_locations.json` / `scripts/sync-emulator-coords.mjs`
+ * when you change reference coordinates.
+ *
+ * Idempotent: skips documents that already have non-null lat/lon.
  */
 
 const LOCATION_MAP = {
@@ -110,6 +116,7 @@ function findLocation(txnName) {
   return null;
 }
 
+/** Lists all transactions for `userId`, patches missing locations where a map match exists. */
 export async function handlePatchSandboxLocations({
   req, res, log, error,
   databases, databaseId, transactionsTableId, Query,
