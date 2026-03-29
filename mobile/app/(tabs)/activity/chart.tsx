@@ -6,17 +6,17 @@ import PieChart from "react-native-pie-chart";
 const GRID = 8;
 
 function formatMoney(value: number): string {
-  return `$${value}`;
+  return `$${value.toFixed(2)}`;
 }
 
 export default function Screen() {
   const { categories, ready } = useActivityCategories();
-  const widthAndHeight = GRID * 24; // 192
+  const widthAndHeight = GRID * 24;
 
   const { series, totalSpent, sortedData } = useMemo(() => {
     const total = categories.reduce((sum, item) => sum + item.spent, 0);
     const ser = categories.map((item) => ({
-      value: Math.max(item.spent, 0),
+      value: Math.max(item.spent, 0.01),
       color: item.color,
     }));
     const sorted = [...categories].sort((a, b) => b.spent - a.spent);
@@ -38,20 +38,21 @@ export default function Screen() {
       <Text style={styles.title}>Spending Breakdown</Text>
 
       <View style={styles.card}>
-        <Text style={styles.cardTitle}>Weekly Category Spending</Text>
+        <Text style={styles.cardTitle}>Category Spending</Text>
 
         {categories.length === 0 ? (
           <Text style={styles.emptyHint}>
-            Add categories on the Categories tab to see your breakdown here.
+            No transactions yet. Link a bank account and sync to see your
+            spending breakdown here.
           </Text>
         ) : !showChart ? (
           <View style={styles.emptyChartBlock}>
             <Text style={styles.emptyHint}>
-              No spending recorded yet. Edit amounts under Categories.
+              No outgoing spending recorded yet.
             </Text>
             <View style={styles.placeholderTotals}>
               <Text style={styles.chartCenterAmount}>{formatMoney(0)}</Text>
-              <Text style={styles.chartCenterLabel}>This Week</Text>
+              <Text style={styles.chartCenterLabel}>Total</Text>
             </View>
           </View>
         ) : (
@@ -66,7 +67,7 @@ export default function Screen() {
               <Text style={styles.chartCenterAmount}>
                 {formatMoney(totalSpent)}
               </Text>
-              <Text style={styles.chartCenterLabel}>This Week</Text>
+              <Text style={styles.chartCenterLabel}>Total Spent</Text>
             </View>
           </View>
         )}
@@ -105,7 +106,7 @@ export default function Screen() {
       </View>
 
       <View style={styles.card}>
-        <Text style={styles.cardTitle}>Weekly Summary</Text>
+        <Text style={styles.cardTitle}>Summary</Text>
 
         <View style={styles.summaryRow}>
           <Text style={styles.summaryLabel}>Total Spent</Text>
