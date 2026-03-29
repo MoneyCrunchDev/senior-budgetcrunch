@@ -35,7 +35,7 @@ if (token) Mapbox.setAccessToken(token);
 
 /**
  * Basemap with strong default POI coverage (restaurants, retail, groceries, etc.).
- * The native default is already “Street”; we pin **Streets v12** so behavior is explicit.
+ * The native default is already "Street"; we pin **Streets v12** so behavior is explicit.
  *
  * For even more labels: duplicate **Streets** in Mapbox Studio, lower `minzoom` on
  * `poi-label` (and related POI layers), then set `EXPO_PUBLIC_MAPBOX_STYLE_URL` to your style URL.
@@ -50,7 +50,7 @@ const DEFAULT_ZOOM = 13;
 
 type LocationPermissionStatus = "undetermined" | "granted" | "denied";
 
-/** Approx tab bar height so FAB sits above it (Expo tabs ~49–56). */
+/** Approx tab bar height so FAB sits above it (Expo tabs ~49\u201356). */
 const TAB_BAR_EXTRA = 8;
 
 /** Envelope FAB size; recenter stacks above with this gap. */
@@ -110,6 +110,8 @@ export default function Index() {
   /** When false, user panned away; show recenter FAB. */
   const [followingUser, setFollowingUser] = useState(true);
 
+  const currentZoomRef = useRef(DEFAULT_ZOOM);
+
   useEffect(() => {
     let cancelled = false;
 
@@ -151,11 +153,16 @@ export default function Index() {
 
   const canFollowUser = permissionStatus === "granted";
 
-  /** v10: user pan/zoom/rotate sets isGestureActive — turn off follow until they tap recenter. */
   const onCameraChanged = useCallback(
-    (state: { gestures?: { isGestureActive?: boolean } }) => {
+    (state: {
+      gestures?: { isGestureActive?: boolean };
+      properties?: { zoom?: number };
+    }) => {
       if (state.gestures?.isGestureActive) {
         setFollowingUser(false);
+      }
+      if (state.properties?.zoom != null) {
+        currentZoomRef.current = state.properties.zoom;
       }
     },
     []
@@ -196,10 +203,15 @@ export default function Index() {
     (event: { features: GeoJSON.Feature[]; coordinates: { latitude: number; longitude: number } }) => {
       const { latitude, longitude } = event.coordinates;
       if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) return;
-      const nearby = findNearbyHeatmapTransactions(transactions, {
-        lat: latitude,
-        lon: longitude,
-      });
+
+      const zoom = currentZoomRef.current;
+      const tapRadius = zoom < 10 ? 2000 : zoom < 13 ? 500 : 250;
+
+      const nearby = findNearbyHeatmapTransactions(
+        transactions,
+        { lat: latitude, lon: longitude },
+        tapRadius
+      );
       if (nearby.length === 0) return;
       setMoneyPitTransactions(nearby);
       setSheetOpen(true);
@@ -241,67 +253,61 @@ export default function Index() {
               id="spendingHeatmapLayer"
               style={{
                 /**
-                 * Radius is in **screen pixels**. If it stops growing past a zoom level, the blob
-                 * looks “stuck” on the glass while the map zooms — we extend stops to ~22 so street
-                 * zoom scales up with the map (roughly constant geographic feel).
+                 * Large radius at low zoom merges nearby money pits into
+                 * regional hot-zones; radius shrinks as user zooms in so
+                 * individual locations separate, but stays big enough to
+                 * still look like heat blobs at street level.
                  */
                 heatmapRadius: [
                   "interpolate",
-                  ["exponential", 1.75],
+                  ["exponential", 1.6],
                   ["zoom"],
-                  3,
-                  2,
-                  8,
-                  6,
-                  11,
-                  14,
-                  13,
-                  28,
-                  15,
-                  52,
-                  17,
-                  96,
-                  19,
-                  168,
-                  21,
-                  260,
+                  3, 30,
+                  6, 40,
+                  9, 45,
+                  11, 35,
+                  13, 30,
+                  15, 40,
+                  17, 60,
+                  19, 90,
+                  21, 130,
                 ],
                 heatmapWeight: ["get", "weight"],
                 heatmapIntensity: [
                   "interpolate",
                   ["linear"],
                   ["zoom"],
-                  0,
-                  0.65,
-                  11,
-                  0.9,
-                  15,
-                  1.05,
-                  19,
-                  1.15,
+                  0, 1.5,
+                  8, 1.2,
+                  11, 0.9,
+                  14, 0.85,
+                  17, 0.8,
+                  20, 0.75,
                 ],
                 heatmapColor: [
                   "interpolate",
                   ["linear"],
                   ["heatmap-density"],
-                  0,
-                  "rgba(33, 102, 172, 0)",
-                  0.15,
-                  "rgb(103, 169, 207)",
-                  0.35,
-                  "rgb(209, 229, 240)",
-                  0.5,
-                  "rgb(253, 219, 199)",
-                  0.65,
-                  "rgb(239, 138, 98)",
-                  0.8,
-                  "rgb(215, 48, 31)",
-                  1,
-                  "rgb(165, 0, 38)",
+                  0, "rgba(33, 102, 172, 0)",
+                  0.15, "rgb(103, 169, 207)",
+                  0.35, "rgb(209, 229, 240)",
+                  0.5, "rgb(253, 219, 199)",
+                  0.65, "rgb(239, 138, 98)",
+                  0.8, "rgb(215, 48, 31)",
+                  1, "rgb(165, 0, 38)",
                 ],
-                heatmapOpacity: 0.55,
+                heatmapOpacity: [
+                  "interpolate",
+                  ["linear"],
+                  ["zoom"],
+                  0, 0.6,
+                  13, 0.55,
+                  17, 0.55,
+                  22, 0.5,
+                ],
               }}
             />
+
             <Mapbox.CircleLayer
               id="spendingHeatmapTapTarget"
               style={{
@@ -365,7 +371,7 @@ export default function Index() {
       {checking && (
         <View style={styles.overlay}>
           <ActivityIndicator size="large" color="#333" />
-          <Text style={styles.overlayText}>Requesting location access…</Text>
+          <Text style={styles.overlayText}>Requesting location access\u2026</Text>
         </View>
       )}
 
@@ -382,7 +388,7 @@ export default function Index() {
             <Text style={styles.heatmapHintText}>
               {transactions.length === 0
                 ? "No transactions loaded yet. Open Timeline and pull to sync, or use Sync transactions in Settings."
-                : "No outflow with map locations in your loaded data. Tap the envelope (bottom-right) to see purchases without coordinates — common in Sandbox."}
+                : "No outflow with map locations in your loaded data. Tap the envelope (bottom-right) to see purchases without coordinates \u2014 common in Sandbox."}
             </Text>
           </View>
         )}
@@ -390,7 +396,7 @@ export default function Index() {
       {!checking && permissionStatus === "denied" && (
         <View style={styles.banner}>
           <Text style={styles.bannerText}>
-            Location denied — allow in Settings to center the map on you.
+            Location denied \u2014 allow in Settings to center the map on you.
           </Text>
           <TouchableOpacity
             style={styles.settingsButton}
