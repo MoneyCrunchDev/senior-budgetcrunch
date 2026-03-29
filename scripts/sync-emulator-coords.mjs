@@ -1,6 +1,15 @@
 /**
- * One-shot: copy exact lat/lon from locations_emulator.txt order into sandbox_locations.json.
- * Run: node scripts/sync-emulator-coords.mjs
+ * Dev-only maintenance: overwrite `lat`/`lon` on each row of `sandbox_locations.json`
+ * using the `coords` array below (same length and row order as that file).
+ *
+ * Why this exists: the repo keeps a canonical list of sandbox merchant locations for
+ * demos and the spending map. Coordinates are aligned with map/emulator verification.
+ * The mobile app does not read this JSON at runtime — live sandbox data gets patched
+ * server-side via `patchSandboxLocations` + `LOCATION_MAP` in
+ * `functions/plaid/src/handlers/patchSandboxLocations.js`. When you change coordinates
+ * here, update that handler’s maps too so Appwrite-stored transactions stay consistent.
+ *
+ * Run: `node scripts/sync-emulator-coords.mjs`
  */
 import { readFileSync, writeFileSync } from "fs";
 import { fileURLToPath } from "url";
@@ -9,6 +18,7 @@ import { dirname, join } from "path";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = join(__dirname, "..");
 
+// Order matches `sandbox_locations.json` top-to-bottom (one pair per merchant row).
 const coords = [
   [37.41223626796634, -122.05563935846753],
   [37.408283396572365, -122.07761420507997],
