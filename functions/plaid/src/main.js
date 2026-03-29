@@ -5,6 +5,7 @@ import { handleExchangePublicToken } from './handlers/exchangePublicToken.js';
 import { handleSyncTransactions } from './handlers/syncTransactions.js';
 import { handleGetLinkedItems } from './handlers/getLinkedItems.js';
 import { handleGetTransactions } from './handlers/getTransactions.js';
+import { handlePatchSandboxLocations } from './handlers/patchSandboxLocations.js';
 
 const ACTIONS = {
   createLinkToken: handleCreateLinkToken,
@@ -12,6 +13,7 @@ const ACTIONS = {
   syncTransactions: handleSyncTransactions,
   getLinkedItems: handleGetLinkedItems,
   getTransactions: handleGetTransactions,
+  patchSandboxLocations: handlePatchSandboxLocations,
 };
 
 export default async ({ req, res, log, error }) => {
