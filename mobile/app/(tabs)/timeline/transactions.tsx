@@ -16,6 +16,7 @@ import { useAuth } from "@/context/AuthContext";
 import ModalBottomSheet from "@/components/ModalBottomSheet";
 import { useTransactions } from "@/context/TransactionContext";
 import { getLinkedItems, type LinkedItem, type Transaction } from "@/lib/plaidApi";
+import { getPrimaryLabel, getDetailedLabel } from "@/lib/categoryHelpers";
 
 const GRID = 8;
 const MONTHS = [
@@ -38,30 +39,6 @@ function formatAmount(amount: number): string {
   if (amount > 0) return `-$${abs.toFixed(2)}`; // outflow
   if (amount < 0) return `+$${abs.toFixed(2)}`; // inflow
   return `$0.00`;
-}
-
-function getCategoryLabel(category: string | null): string {
-  if (!category) return "Uncategorized";
-  try {
-    const parsed = JSON.parse(category);
-    if (Array.isArray(parsed) && parsed.length) return parsed[parsed.length - 1];
-    if (typeof parsed === "string") return parsed;
-  } catch {
-    return category;
-  }
-  return "Uncategorized";
-}
-
-function getCategoryLabelFull(category: string | null): string {
-  if (!category) return "Uncategorized";
-  try {
-    const parsed = JSON.parse(category);
-    if (Array.isArray(parsed) && parsed.length) return parsed.join(" › ");
-    if (typeof parsed === "string") return parsed;
-  } catch {
-    return category;
-  }
-  return "Uncategorized";
 }
 
 function formatDateFull(dateStr: string | null): string {
@@ -93,7 +70,7 @@ function TransactionDetailSheetContent({
       </View>
       <View style={styles.detailCard}>
         <Text style={styles.detailLabel}>Category</Text>
-        <Text style={styles.detailValue}>{getCategoryLabelFull(transaction.category)}</Text>
+        <Text style={styles.detailValue}>{getDetailedLabel(transaction)}</Text>
       </View>
       <View style={styles.detailCard}>
         <Text style={styles.detailLabel}>Date</Text>
@@ -478,7 +455,7 @@ export default function TransactionsScreen() {
                     {t.merchant_name || t.name || "Unknown"}
                   </Text>
                   <Text style={styles.rowCategory}>
-                    {getCategoryLabel(t.category)}
+                    {getPrimaryLabel(t)}
                   </Text>
                   <Text style={styles.rowDate}>
                     {formatDateMonthDay(t.date)}
