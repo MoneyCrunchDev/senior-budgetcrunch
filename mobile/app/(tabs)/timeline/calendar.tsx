@@ -1,5 +1,6 @@
 import React, { useCallback, useMemo, useRef, useState } from "react";
 import {
+  RefreshControl,
   ScrollView,
   StyleSheet,
   Text,
@@ -70,10 +71,11 @@ function shortMonthDay(dateStr: string): string {
 
 export default function CalendarScreen() {
   const { height } = useWindowDimensions();
-  const { transactions } = useTransactions();
-  const { categories } = useActivityCategories();
+  const { transactions, loadTransactions } = useTransactions();
+  const { categories, refreshPrefs } = useActivityCategories();
 
   const sheetRef = useRef<BottomSheet>(null);
+  const [listRefreshing, setListRefreshing] = useState(false);
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedWeekKey, setSelectedWeekKey] = useState<string | null>(null);
   const [sheetMode, setSheetMode] = useState<"day" | "week">("day");
@@ -88,6 +90,15 @@ export default function CalendarScreen() {
       sheetRef.current?.snapToIndex(0);
     });
   }, []);
+
+  const onListRefresh = useCallback(async () => {
+    setListRefreshing(true);
+    try {
+      await Promise.all([loadTransactions(), refreshPrefs()]);
+    } finally {
+      setListRefreshing(false);
+    }
+  }, [loadTransactions, refreshPrefs]);
 
   // ── 1. Daily spending per category ──────────────────────────────────
   // Map<dateStr, Map<categorySlug, totalAmount>>
@@ -455,6 +466,14 @@ export default function CalendarScreen() {
         style={styles.scrollOuter}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={listRefreshing}
+            onRefresh={onListRefresh}
+            tintColor="#007AFF"
+            colors={["#007AFF"]}
+          />
+        }
       >
         <Calendar
           style={styles.calendar}
