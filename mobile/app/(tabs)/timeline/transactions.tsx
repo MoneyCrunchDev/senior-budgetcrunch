@@ -24,6 +24,12 @@ const MONTHS = [
   "July", "August", "September", "October", "November", "December",
 ];
 
+function linkedBankLabel(item: LinkedItem): string {
+  const n = item.institutionName?.trim();
+  if (n) return n;
+  return `Account …${item.itemId.slice(-6)}`;
+}
+
 function formatDateMonthDay(dateStr: string | null): string {
   if (!dateStr) return "—";
   const d = new Date(dateStr + "Z");
@@ -235,11 +241,13 @@ export default function TransactionsScreen() {
   };
 
   const monthLabel = `${MONTHS[month - 1]} ${year}`;
-  const accountLabel = selectedItemId === null
-    ? "All accounts"
-    : linkedItems.find((i) => i.itemId === selectedItemId)
-      ? `Account …${selectedItemId.slice(-6)}`
-      : "All accounts";
+  const accountLabel =
+    selectedItemId == null
+      ? "All accounts"
+      : (() => {
+          const li = linkedItems.find((i) => i.itemId === selectedItemId);
+          return li != null ? linkedBankLabel(li) : "All accounts";
+        })();
 
   const filteredSortedAndGrouped = useMemo(() => {
     let list = filteredForView;
@@ -318,7 +326,7 @@ export default function TransactionsScreen() {
               }}
             >
               <Text style={styles.pickerRowText}>
-                Account …{item.itemId.slice(-6)}
+                {linkedBankLabel(item)}
               </Text>
             </TouchableOpacity>
           ))}
