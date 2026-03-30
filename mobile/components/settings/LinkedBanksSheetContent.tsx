@@ -85,24 +85,26 @@ export default function LinkedBanksSheetContent({
 
       {!loading &&
         !error &&
-        items.map((item, idx) => (
-          <View key={item.itemId ?? idx} style={styles.card}>
-            <Text style={styles.itemLabel}>Item ID</Text>
-            <Text style={styles.itemValue} selectable>
-              {item.itemId}
-            </Text>
-            {item.linkedAt ? (
-              <>
-                <Text style={[styles.itemLabel, { marginTop: GRID }]}>
-                  Linked on
+        items.map((item, idx) => {
+          const title =
+            item.institutionName?.trim() || "Linked account";
+          return (
+            <View key={item.itemId ?? idx} style={styles.card}>
+              <Text style={styles.bankTitle}>{title}</Text>
+              {item.linkedAt ? (
+                <Text style={styles.linkedMeta}>
+                  Linked on {new Date(item.linkedAt).toLocaleDateString()}
                 </Text>
-                <Text style={styles.itemValue}>
-                  {new Date(item.linkedAt).toLocaleDateString()}
-                </Text>
-              </>
-            ) : null}
-          </View>
-        ))}
+              ) : null}
+              <Text style={[styles.itemLabel, { marginTop: GRID }]}>
+                Connection ID
+              </Text>
+              <Text style={styles.itemIdMuted} selectable>
+                {item.itemId}
+              </Text>
+            </View>
+          );
+        })}
 
       <TouchableOpacity
         style={styles.addButton}
@@ -133,6 +135,16 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#E6E8EC",
   },
+  bankTitle: {
+    fontSize: 17,
+    fontWeight: "700",
+    color: "#111",
+  },
+  linkedMeta: {
+    fontSize: 13,
+    color: "#666",
+    marginTop: 4,
+  },
   itemLabel: {
     fontSize: 12,
     fontWeight: "600",
@@ -144,6 +156,12 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: "500",
     color: "#222",
+    marginTop: 2,
+  },
+  itemIdMuted: {
+    fontSize: 12,
+    fontWeight: "400",
+    color: "#999",
     marginTop: 2,
   },
   emptyText: {
