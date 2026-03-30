@@ -13,11 +13,14 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useAuth } from "@/context/AuthContext";
 import { createLinkToken, exchangePublicToken } from "@/lib/plaidApi";
+import * as Haptics from "expo-haptics";
 import { router } from "expo-router";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
+  BackHandler,
+  InteractionManager,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -35,21 +38,54 @@ import {
 } from "react-native-plaid-link-sdk";
 
 const GRID = 8;
+const ACCENT_GREEN = "#2ECC71";
+const ACCENT_GREEN_DARK = "#27AE60";
+
+type LinkSuccessState = { institutionName: string };
 
 export default function BankConnectScreen() {
   const { user, loading: authLoading } = useAuth();
   const [busy, setBusy] = useState(false);
+  const [linkSuccess, setLinkSuccess] = useState<LinkSuccessState | null>(null);
+  const hapticsFired = useRef(false);
   const insets = useSafeAreaInsets();
+
+  useEffect(() => {
+    if (!linkSuccess || hapticsFired.current) return;
+    hapticsFired.current = true;
+    void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+  }, [linkSuccess]);
+
+  /** Avoid Fabric race on Android: do not setState + replace in one tick; defer navigation. */
+  const leaveAfterLinkSuccess = useCallback(() => {
+    hapticsFired.current = false;
+    InteractionManager.runAfterInteractions(() => {
+      router.replace("/(tabs)/settings/account");
+    });
+  }, []);
+
+  useEffect(() => {
+    if (!linkSuccess) return;
+    const sub = BackHandler.addEventListener("hardwareBackPress", () => {
+      leaveAfterLinkSuccess();
+      return true;
+    });
+    return () => sub.remove();
+  }, [linkSuccess, leaveAfterLinkSuccess]);
 
   const userId = user?.$id ?? null;
 
   const handleBack = useCallback(() => {
+    if (linkSuccess) {
+      leaveAfterLinkSuccess();
+      return;
+    }
     if (router.canGoBack()) {
       router.back();
     } else {
       router.replace("/(tabs)/settings/account");
     }
-  }, []);
+  }, [linkSuccess, leaveAfterLinkSuccess]);
 
   const onConnectBank = useCallback(async () => {
     if (!userId) {
@@ -71,22 +107,14 @@ export default function BankConnectScreen() {
         onSuccess: async (success: LinkSuccess) => {
           try {
             const inst = success.metadata?.institution;
-            const result = await exchangePublicToken(userId!, success.publicToken, {
+            await exchangePublicToken(userId!, success.publicToken, {
               institutionName: inst?.name,
               institutionId: inst?.id,
             });
             setBusy(false);
+            dismissLink();
             const bankLabel = inst?.name?.trim() || "Your bank";
-            Alert.alert(
-              "Bank linked",
-              `${bankLabel} is connected.`,
-              [
-                {
-                  text: "OK",
-                  onPress: () => router.replace("/(tabs)/settings/account"),
-                },
-              ],
-            );
+            setLinkSuccess({ institutionName: bankLabel });
           } catch (e) {
             setBusy(false);
             const msg = e instanceof Error ? e.message : String(e);
@@ -133,7 +161,7 @@ export default function BankConnectScreen() {
             pressed && styles.backRowPressed,
           ]}
           accessibilityRole="button"
-          accessibilityLabel="Go back"
+          accessibilityLabel={linkSuccess ? "Done, go back" : "Go back"}
         >
           <Ionicons name="chevron-back" size={22} color="#111" />
           <Text style={styles.backText}>Back</Text>
@@ -148,37 +176,58 @@ export default function BankConnectScreen() {
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
-        <View style={styles.card}>
-          <View style={styles.iconWrap}>
-            <View style={styles.iconCircle}>
-              <Ionicons name="shield-checkmark" size={32} color="#1B5E20" />
+        {linkSuccess ? (
+          <View style={styles.card}>
+            <View style={styles.successBadge}>
+              <View style={styles.successIconRing}>
+                <Ionicons name="checkmark" size={36} color="#FFF" />
+              </View>
+            </View>
+            <Text style={styles.successKicker}>Bank linked</Text>
+            <Text style={styles.successBankName}>{linkSuccess.institutionName}</Text>
+            <Text style={styles.successSubhead}>
+              You’re all set — we’ll keep transactions in sync for your budget.
+            </Text>
+            <View style={styles.successCheckRow}>
+              <Ionicons name="lock-closed" size={18} color={ACCENT_GREEN_DARK} />
+              <Text style={styles.successCheckText}>
+              Connected securely through Plaid; we never see your bank password.
+              </Text>
             </View>
           </View>
+        ) : (
+          <View style={styles.card}>
+            <View style={styles.iconWrap}>
+              <View style={styles.iconCircle}>
+                <Ionicons name="shield-checkmark" size={32} color="#1B5E20" />
+              </View>
+            </View>
 
-          <Text style={styles.title}>Connect your bank</Text>
-          <Text style={styles.body}>
-            {`We use Plaid to connect your accounts securely. You'll sign in to your bank inside Plaid's flow. Sandbox: use any test institution and credentials from Plaid's docs.`}
-          </Text>
-          {!userId ? (
-            <Text style={styles.warn}>
-              Sign in first, then return here to connect.
+            <Text style={styles.title}>Connect your bank</Text>
+            <Text style={styles.body}>
+              {`We use Plaid to connect your accounts securely. You'll sign in to your bank inside Plaid's flow. Sandbox: use any test institution and credentials from Plaid's docs.`}
             </Text>
-          ) : null}
-          <Pressable
-            style={[
-              styles.button,
-              (!userId || busy) && styles.buttonDisabled,
-            ]}
-            onPress={onConnectBank}
-            disabled={!userId || busy}
-          >
-            {busy ? (
-              <ActivityIndicator color="#fff" />
-            ) : (
-              <Text style={styles.buttonText}>Connect bank</Text>
-            )}
-          </Pressable>
-        </View>
+            {!userId ? (
+              <Text style={styles.warn}>
+                Sign in first, then return here to connect.
+              </Text>
+            ) : null}
+            <Pressable
+              style={[
+                styles.button,
+                (!userId || busy) && styles.buttonDisabled,
+              ]}
+              onPress={onConnectBank}
+              disabled={!userId || busy}
+            >
+              {busy ? (
+                <ActivityIndicator color="#fff" />
+              ) : (
+                <Text style={styles.buttonText}>Connect bank</Text>
+              )}
+            </Pressable>
+          </View>
+        )}
       </ScrollView>
     </View>
   );
@@ -288,6 +337,82 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 17,
     fontWeight: "700",
+  },
+
+  successBadge: {
+    alignItems: "center",
+    marginBottom: GRID * 2,
+  },
+
+  successIconRing: {
+    width: GRID * 11,
+    height: GRID * 11,
+    borderRadius: GRID * 5.5,
+    backgroundColor: ACCENT_GREEN,
+    alignItems: "center",
+    justifyContent: "center",
+    shadowColor: ACCENT_GREEN,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.35,
+    shadowRadius: 16,
+    elevation: 8,
+  },
+
+  successKicker: {
+    fontSize: 13,
+    fontWeight: "700",
+    color: ACCENT_GREEN_DARK,
+    textAlign: "center",
+    letterSpacing: 1.2,
+    textTransform: "uppercase",
+    marginBottom: GRID / 2,
+  },
+
+  successBankName: {
+    fontSize: 26,
+    fontWeight: "800",
+    color: "#111",
+    textAlign: "center",
+    marginBottom: GRID * 1.5,
+    marginTop: GRID / 2,
+    letterSpacing: -0.3,
+  },
+
+  successSubhead: {
+    fontSize: 17,
+    lineHeight: 24,
+    fontWeight: "600",
+    color: "#374151",
+    textAlign: "center",
+    marginBottom: GRID * 1.5,
+  },
+
+  successBody: {
+    fontSize: 15,
+    lineHeight: 22,
+    color: "#6B7280",
+    textAlign: "center",
+    marginBottom: GRID * 2,
+  },
+
+  successCheckRow: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: GRID,
+    backgroundColor: "#E8F8EF",
+    borderRadius: GRID,
+    padding: GRID * 1.5,
+    marginBottom: 0,
+    borderWidth: 1,
+    borderColor: "#C8EDD8",
+  },
+
+  successCheckText: {
+    flex: 1,
+    fontSize: 14,
+    lineHeight: 20,
+    color: "#1B4332",
+    fontWeight: "500",
   },
 
   hint: {
