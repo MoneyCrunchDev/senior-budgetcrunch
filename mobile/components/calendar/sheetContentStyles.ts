@@ -82,6 +82,7 @@ export const sheetContentStyles = StyleSheet.create({
     color: "#6B7280",
     marginTop: 2,
     fontWeight: "500",
+    lineHeight: 14,
   },
   insightCallout: {
     flexDirection: "row",
@@ -107,20 +108,6 @@ export const sheetContentStyles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "600",
     color: "#111827",
-  },
-
-  redDayRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-    paddingVertical: GRID,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: "#E6E8EC",
-  },
-  redDayItem: {
-    fontSize: 14,
-    color: "#C62828",
-    fontWeight: "600",
   },
 
   sectionHint: {
@@ -215,5 +202,163 @@ export const sheetContentStyles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "700",
     color: "#111",
+  },
+
+  /** Compact “over daily limit” date chips (week sheet). */
+  sectionCardCompact: {
+    backgroundColor: "#F8F9FB",
+    borderWidth: 1,
+    borderColor: "#E6E8EC",
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    marginBottom: 12,
+  },
+  sectionTitleCompact: {
+    fontSize: 11,
+    fontWeight: "700",
+    color: "#6B7280",
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
+    marginBottom: 6,
+  },
+  overrunChipRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 6,
+  },
+  overrunChip: {
+    backgroundColor: "#FFEBEE",
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 8,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: "#FFCDD2",
+  },
+  overrunChipText: {
+    fontSize: 13,
+    fontWeight: "600",
+    color: "#B71C1C",
+  },
+
+  /** Redesigned sheet header (week + day). */
+  sheetHero: {
+    backgroundColor: "#F4F6FA",
+    borderRadius: 14,
+    padding: 14,
+    marginBottom: 12,
+  },
+  sheetHeaderRow: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    justifyContent: "space-between",
+    gap: 10,
+    marginBottom: 6,
+  },
+  sheetHeaderTitle: {
+    flex: 1,
+    fontSize: 19,
+    fontWeight: "700",
+    color: "#111827",
+    lineHeight: 24,
+  },
+  sheetHeroMuted: {
+    fontSize: 13,
+    color: "#6B7280",
+    lineHeight: 18,
+    marginBottom: 10,
+  },
+  sheetTotalMain: {
+    fontSize: 28,
+    fontWeight: "800",
+    color: "#111827",
+    letterSpacing: -0.5,
+  },
+  sheetTotalSub: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#9CA3AF",
+    marginTop: 2,
+  },
+  overInlineRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    alignItems: "center",
+    gap: 6,
+    marginBottom: 10,
+  },
+  overInlineLabel: {
+    fontSize: 12,
+    fontWeight: "600",
+    color: "#6B7280",
+  },
+
+  listBlock: {
+    backgroundColor: "#F8F9FB",
+    borderWidth: 1,
+    borderColor: "#E6E8EC",
+    borderRadius: 12,
+    padding: 12,
+    marginBottom: 12,
+  },
+  listBlockTitle: {
+    fontSize: 12,
+    fontWeight: "700",
+    color: "#6B7280",
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
+    marginBottom: 8,
+  },
+  listBlockTitleInline: {
+    marginBottom: 0,
+    flex: 1,
+    minWidth: 0,
+  },
+  listBlockHeaderRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 10,
+    marginBottom: 8,
+  },
+  listBlockHeaderMeta: {
+    fontSize: 13,
+    fontWeight: "600",
+    color: "#6B7280",
+    flexShrink: 0,
+  },
+  listBlockHeaderMetaWarn: {
+    color: "#C62828",
+  },
+  listBlockHeaderMetaOk: {
+    color: "#1B5E20",
+  },
+  listBlockFoot: {
+    fontSize: 11,
+    color: "#9CA3AF",
+    lineHeight: 15,
+    marginTop: 10,
+  },
+
+  catBlock: {
+    paddingVertical: 10,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: "#E6E8EC",
+  },
+  catBlockTop: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  barTrack: {
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: "#E5E7EB",
+    overflow: "hidden",
+    marginTop: 8,
+  },
+  barFill: {
+    height: "100%",
+    borderRadius: 2,
   },
 });

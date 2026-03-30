@@ -11,6 +11,7 @@ export type {
 
 export {
   formatDateNice,
+  formatDateShort,
   formatMoney,
   MONTHS,
   STATUS_META,

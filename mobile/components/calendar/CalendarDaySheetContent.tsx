@@ -30,29 +30,22 @@ export default function CalendarDaySheetContent({ summary, dateStr }: Props) {
         )
       : null;
 
-  const dayIcon: keyof typeof Ionicons.glyphMap = isRedDay
-    ? "warning"
-    : totalSpent === 0
-      ? "sunny"
-      : "checkmark-circle";
-  const dayIconColor = isRedDay
-    ? "#C62828"
-    : totalSpent === 0
-      ? "#F57F17"
-      : "#1B5E20";
-  const dayIconBg = isRedDay
-    ? "#FFEBEE"
-    : totalSpent === 0
-      ? "#FFF9C4"
-      : "#E8F5E9";
+  let statusLine: string | null = null;
+  if (totalSpent === 0) {
+    statusLine = "No outflows on this day.";
+  } else if (hasBudg && isRedDay) {
+    statusLine =
+      "At least one budgeted category went over its share of today’s monthly budget.";
+  } else if (hasBudg && !isRedDay) {
+    statusLine =
+      "Every budgeted category stayed within its share of today’s monthly budget.";
+  }
 
   return (
     <View>
-      <View style={styles.heroCard}>
-        <View style={styles.heroTopRow}>
-          <View style={[styles.heroIconWrap, { backgroundColor: dayIconBg }]}>
-            <Ionicons name={dayIcon} size={20} color={dayIconColor} />
-          </View>
+      <View style={styles.sheetHero}>
+        <View style={styles.sheetHeaderRow}>
+          <Text style={styles.sheetHeaderTitle}>{formatDateNice(dateStr)}</Text>
           {hasBudg ? (
             <View
               style={[
@@ -66,36 +59,19 @@ export default function CalendarDaySheetContent({ summary, dateStr }: Props) {
                   { color: isRedDay ? "#C62828" : "#1B5E20" },
                 ]}
               >
-                {isRedDay ? "Over Daily Target" : "Within Target"}
+                {isRedDay ? "Over daily target" : "Within daily target"}
               </Text>
             </View>
           ) : null}
         </View>
 
-        <Text style={styles.heroTitle}>{formatDateNice(dateStr)}</Text>
-
-        {hasBudg && isRedDay ? (
-          <Text style={styles.heroExplainer}>
-            At least one category exceeded its daily budget today. The day is
-            marked red even if your total looks fine — it means specific
-            categories need attention.
-          </Text>
-        ) : null}
-        {hasBudg && !isRedDay && totalSpent > 0 ? (
-          <Text style={styles.heroExplainer}>
-            All budgeted categories stayed within their daily targets today. Nice
-            pacing!
-          </Text>
-        ) : null}
-        {totalSpent === 0 ? (
-          <Text style={styles.heroExplainer}>
-            No outflows recorded for this day.
-          </Text>
+        {statusLine ? (
+          <Text style={styles.sheetHeroMuted}>{statusLine}</Text>
         ) : null}
 
         <Text
           style={[
-            styles.heroTotal,
+            styles.sheetTotalMain,
             {
               color:
                 totalSpent === 0
@@ -106,47 +82,17 @@ export default function CalendarDaySheetContent({ summary, dateStr }: Props) {
             },
           ]}
         >
-          {formatMoney(totalSpent)}{" "}
-          <Text style={styles.heroTotalSuffix}>total spent</Text>
+          {formatMoney(totalSpent)}
         </Text>
-
-        {hasBudg ? (
-          <View style={styles.statRow}>
-            <View style={styles.statPill}>
-              <Text style={styles.statPillValue}>{dayTxns.length}</Text>
-              <Text style={styles.statPillLabel}>
-                transaction{dayTxns.length !== 1 ? "s" : ""}
-              </Text>
-            </View>
-            <View style={styles.statPill}>
-              <Text
-                style={[
-                  styles.statPillValue,
-                  overRows.length > 0 && localStyles.statWarn,
-                ]}
-              >
-                {overRows.length}
-              </Text>
-              <Text style={styles.statPillLabel}>
-                cat{overRows.length !== 1 ? "s" : ""} over
-              </Text>
-            </View>
-            <View style={styles.statPill}>
-              <Text style={styles.statPillValue}>
-                {formatMoney(unbudgetedTotal)}
-              </Text>
-              <Text style={styles.statPillLabel}>untracked</Text>
-            </View>
-          </View>
-        ) : null}
+        <Text style={styles.sheetTotalSub}>total spent</Text>
 
         {worstCat ? (
-          <View style={styles.insightCallout}>
+          <View style={localStyles.heroFooterCallout}>
             <Ionicons name="trending-up" size={18} color="#C62828" />
             <View style={styles.insightCalloutBody}>
-              <Text style={styles.insightCalloutLabel}>Biggest overrun</Text>
-              <Text style={styles.insightCalloutValue} numberOfLines={1}>
-                {worstCat.name}: {formatMoney(worstCat.spent)} spent vs.{" "}
+              <Text style={styles.insightCalloutLabel}>Largest gap today</Text>
+              <Text style={styles.insightCalloutValue} numberOfLines={2}>
+                {worstCat.name}: {formatMoney(worstCat.spent)} vs.{" "}
                 {formatMoney(worstCat.dailyBudget)} daily target
               </Text>
             </View>
@@ -154,70 +100,17 @@ export default function CalendarDaySheetContent({ summary, dateStr }: Props) {
         ) : null}
       </View>
 
-      {!hasBudg && totalSpent > 0 ? (
-        <View style={styles.sectionCard}>
-          <View style={localStyles.infoRow}>
-            <Ionicons name="information-circle" size={18} color="#6B7280" />
-            <Text style={styles.sectionHint}>
-              Set monthly budgets in Activity → Categories to enable per-category
-              tracking here.
+      {dayTxns.length > 0 ? (
+        <View style={styles.listBlock}>
+          <View style={styles.listBlockHeaderRow}>
+            <Text style={[styles.listBlockTitle, styles.listBlockTitleInline]}>
+              Purchases
+            </Text>
+            <Text style={styles.listBlockHeaderMeta}>
+              {dayTxns.length}{" "}
+              {dayTxns.length === 1 ? "item" : "items"}
             </Text>
           </View>
-        </View>
-      ) : null}
-
-      {hasBudg && budgetedRows.length > 0 ? (
-        <View style={styles.sectionCard}>
-          <Text style={styles.sectionTitle}>Budget Breakdown</Text>
-          <Text style={styles.sectionHint}>
-            Daily target = your monthly budget for each category, divided by the
-            number of days this month.
-          </Text>
-          {budgetedRows.map((row) => (
-            <View key={row.slug} style={styles.catRow}>
-              <View style={styles.catLeft}>
-                <View style={[styles.catDot, { backgroundColor: row.color }]} />
-                <Text style={styles.catName} numberOfLines={1}>
-                  {row.name}
-                </Text>
-              </View>
-              <View style={styles.catRight}>
-                <Text
-                  style={[
-                    styles.catAmount,
-                    { color: row.isOver ? "#FF3B30" : "#34C759" },
-                  ]}
-                >
-                  {formatMoney(row.spent)}
-                </Text>
-                <Text style={styles.catBudget}>
-                  / {formatMoney(row.dailyBudget)}
-                </Text>
-              </View>
-            </View>
-          ))}
-
-          {unbudgetedTotal > 0 ? (
-            <View style={styles.catRow}>
-              <View style={styles.catLeft}>
-                <View style={[styles.catDot, { backgroundColor: "#9CA3AF" }]} />
-                <Text style={[styles.catName, { color: "#6B7280" }]}>
-                  Unbudgeted
-                </Text>
-              </View>
-              <View style={styles.catRight}>
-                <Text style={[styles.catAmount, { color: "#6B7280" }]}>
-                  {formatMoney(unbudgetedTotal)}
-                </Text>
-              </View>
-            </View>
-          ) : null}
-        </View>
-      ) : null}
-
-      {dayTxns.length > 0 ? (
-        <View style={styles.sectionCard}>
-          <Text style={styles.sectionTitle}>Transactions</Text>
           {dayTxns.map((t, i) => (
             <View
               key={t.transaction_id}
@@ -236,17 +129,142 @@ export default function CalendarDaySheetContent({ summary, dateStr }: Props) {
           ))}
         </View>
       ) : null}
+
+      {!hasBudg && totalSpent > 0 ? (
+        <View style={styles.listBlock}>
+          <View style={localStyles.infoRow}>
+            <Ionicons name="information-circle" size={18} color="#6B7280" />
+            <Text style={styles.sectionHint}>
+              Set monthly budgets in Activity → Categories to see daily targets
+              here.
+            </Text>
+          </View>
+        </View>
+      ) : null}
+
+      {hasBudg && budgetedRows.length > 0 ? (
+        <View style={styles.listBlock}>
+          <View style={styles.listBlockHeaderRow}>
+            <Text style={[styles.listBlockTitle, styles.listBlockTitleInline]}>
+              Daily budget by category
+            </Text>
+            {overRows.length > 0 ? (
+              <Text
+                style={[
+                  styles.listBlockHeaderMeta,
+                  styles.listBlockHeaderMetaWarn,
+                ]}
+              >
+                {overRows.length}{" "}
+                {overRows.length === 1 ? "category" : "categories"} over
+              </Text>
+            ) : totalSpent > 0 ? (
+              <Text
+                style={[styles.listBlockHeaderMeta, styles.listBlockHeaderMetaOk]}
+              >
+                All on track
+              </Text>
+            ) : null}
+          </View>
+          {budgetedRows.map((row) => {
+            const pct =
+              row.dailyBudget > 0
+                ? Math.min(100, (row.spent / row.dailyBudget) * 100)
+                : 0;
+            const spentColor =
+              row.isOver
+                ? "#FF3B30"
+                : row.spent <= 0
+                  ? "#111827"
+                  : "#34C759";
+            const barColor = row.isOver ? "#FF3B30" : "#34C759";
+            return (
+              <View key={row.slug} style={styles.catBlock}>
+                <View style={styles.catBlockTop}>
+                  <View style={styles.catLeft}>
+                    <View style={[styles.catDot, { backgroundColor: row.color }]} />
+                    <Text style={styles.catName} numberOfLines={1}>
+                      {row.name}
+                    </Text>
+                  </View>
+                  <View style={styles.catRight}>
+                    <Text style={[styles.catAmount, { color: spentColor }]}>
+                      {formatMoney(row.spent)}
+                    </Text>
+                    <Text style={styles.catBudget}>
+                      / {formatMoney(row.dailyBudget)}
+                    </Text>
+                  </View>
+                </View>
+                {row.dailyBudget > 0 ? (
+                  <View style={styles.barTrack}>
+                    <View
+                      style={[
+                        styles.barFill,
+                        { width: `${pct}%`, backgroundColor: barColor },
+                      ]}
+                    />
+                  </View>
+                ) : null}
+              </View>
+            );
+          })}
+
+          {unbudgetedTotal > 0 ? (
+            <View style={[styles.catBlock, localStyles.catBlockLast]}>
+              <View style={styles.catBlockTop}>
+                <View style={styles.catLeft}>
+                  <View style={[styles.catDot, { backgroundColor: "#9CA3AF" }]} />
+                  <View style={{ flex: 1, minWidth: 0 }}>
+                    <Text style={[styles.catName, { color: "#6B7280" }]}>
+                      Other spend
+                    </Text>
+                    <Text style={localStyles.catSubLabel}>
+                      In Plaid categories where you have not set a monthly budget
+                    </Text>
+                  </View>
+                </View>
+                <Text style={[styles.catAmount, { color: "#6B7280" }]}>
+                  {formatMoney(unbudgetedTotal)}
+                </Text>
+              </View>
+            </View>
+          ) : null}
+
+          <Text style={styles.listBlockFoot}>
+            Daily target = that category’s monthly budget ÷ days this month.
+          </Text>
+        </View>
+      ) : null}
     </View>
   );
 }
 
 const localStyles = StyleSheet.create({
-  statWarn: { color: "#C62828" },
-  infoRow: {
+  heroFooterCallout: {
     flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-    marginBottom: 4,
+    alignItems: "flex-start",
+    gap: 10,
+    paddingTop: 12,
+    marginTop: 4,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: "#D1D5DB",
   },
   txnRowFirst: { borderTopWidth: 0 },
+  infoRow: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: 8,
+  },
+  catBlockLast: {
+    borderBottomWidth: 0,
+    paddingBottom: 0,
+  },
+  catSubLabel: {
+    fontSize: 11,
+    color: "#9CA3AF",
+    lineHeight: 15,
+    marginTop: 2,
+    fontWeight: "500",
+  },
 });
