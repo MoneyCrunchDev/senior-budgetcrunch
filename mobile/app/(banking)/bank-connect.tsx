@@ -70,14 +70,16 @@ export default function BankConnectScreen() {
       open({
         onSuccess: async (success: LinkSuccess) => {
           try {
-            const result = await exchangePublicToken(
-              userId!,
-              success.publicToken,
-            );
+            const inst = success.metadata?.institution;
+            const result = await exchangePublicToken(userId!, success.publicToken, {
+              institutionName: inst?.name,
+              institutionId: inst?.id,
+            });
             setBusy(false);
+            const bankLabel = inst?.name?.trim() || "Your bank";
             Alert.alert(
               "Bank linked",
-              `Account connected (item: ${result.item_id}).`,
+              `${bankLabel} is connected.`,
               [
                 {
                   text: "OK",
