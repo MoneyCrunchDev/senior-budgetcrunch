@@ -1,8 +1,11 @@
+import { resolveInstitutionFromAccessToken, trimLabel } from '../lib/resolveInstitution.js';
+
 export async function handleExchangePublicToken({
   req, res, log, error,
   plaidClient, databases, databaseId, tableId, ID,
 }) {
-  const { publicToken, userId } = req.body ?? {};
+  const { publicToken, userId, institutionName: bodyInstitutionName, institutionId: bodyInstitutionId } =
+    req.body ?? {};
 
   if (!publicToken) {
     error('[exchangePublicToken] Missing publicToken in request body');
@@ -29,12 +32,24 @@ export async function handleExchangePublicToken({
     return res.json({ error: 'Failed to exchange public token' }, 500);
   }
 
+  let institutionName = trimLabel(bodyInstitutionName);
+  let institutionId = trimLabel(bodyInstitutionId);
+  if (!institutionName || !institutionId) {
+    const resolved = await resolveInstitutionFromAccessToken(plaidClient, accessToken, log);
+    if (!institutionName) institutionName = resolved.institutionName;
+    if (!institutionId) institutionId = resolved.institutionId;
+  }
+
+  const docPayload = {
+    userId,
+    itemId,
+    accessToken,
+  };
+  if (institutionName) docPayload.institutionName = institutionName;
+  if (institutionId) docPayload.institutionId = institutionId;
+
   try {
-    await databases.createDocument(databaseId, tableId, ID.unique(), {
-      userId,
-      itemId,
-      accessToken,
-    });
+    await databases.createDocument(databaseId, tableId, ID.unique(), docPayload);
     log(`[exchangePublicToken] Saved plaid_items row for user: ${userId}, itemId: ${itemId}`);
   } catch (err) {
     error('[exchangePublicToken] Failed to save to DB: ' + (err.message ?? err));
