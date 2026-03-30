@@ -34,7 +34,8 @@ function locationLabel(transactions: Transaction[]): string {
     transactions.map((t) => t.merchant_name || t.name || "Unknown")
   );
   if (merchants.size === 1) return [...merchants][0];
-  return `${merchants.size} merchants`;
+  if (merchants.size > 1) return "Multiple Merchants";
+  return "Spending";
 }
 
 export default function MoneyPitSheetContent({

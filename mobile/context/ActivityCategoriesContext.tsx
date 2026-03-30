@@ -62,6 +62,8 @@ type ActivityCategoriesContextValue = {
     id: string,
     patch: Partial<Pick<ActivityCategory, "budget" | "color">>
   ) => void;
+  /** Re-read budgets and colors from storage (e.g. calendar pull-to-refresh). */
+  refreshPrefs: () => Promise<void>;
 };
 
 const ActivityCategoriesContext =
@@ -142,9 +144,14 @@ export function ActivityCategoriesProvider({
     []
   );
 
+  const refreshPrefs = useCallback(async () => {
+    const loaded = await loadPrefs();
+    setPrefs(loaded);
+  }, []);
+
   const value = useMemo(
-    () => ({ categories, ready, updateCategory }),
-    [categories, ready, updateCategory]
+    () => ({ categories, ready, updateCategory, refreshPrefs }),
+    [categories, ready, updateCategory, refreshPrefs]
   );
 
   return (
