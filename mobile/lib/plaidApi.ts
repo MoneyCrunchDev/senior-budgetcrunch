@@ -25,6 +25,9 @@ type ExchangeBody = {
   action: "exchangePublicToken";
   userId: string;
   publicToken: string;
+  /** From Plaid Link `metadata.institution` when available. */
+  institutionName?: string;
+  institutionId?: string;
 };
 type SyncTransactionsBody = { action: "syncTransactions"; userId: string };
 type GetLinkedItemsBody = { action: "getLinkedItems"; userId: string };
@@ -105,12 +108,19 @@ export interface ExchangeResult {
  */
 export async function exchangePublicToken(
   userId: string,
-  publicToken: string
+  publicToken: string,
+  options?: { institutionName?: string; institutionId?: string }
 ): Promise<ExchangeResult> {
   const data = await postPlaidAction<ExchangeResult & { error?: string }>({
     action: "exchangePublicToken",
     userId,
     publicToken,
+    ...(options?.institutionName != null && options.institutionName !== ""
+      ? { institutionName: options.institutionName }
+      : {}),
+    ...(options?.institutionId != null && options.institutionId !== ""
+      ? { institutionId: options.institutionId }
+      : {}),
   });
   if (!data.ok || !data.item_id) {
     throw new Error(
@@ -123,6 +133,8 @@ export async function exchangePublicToken(
 export interface LinkedItem {
   itemId: string;
   linkedAt: string;
+  institutionName?: string;
+  institutionId?: string;
 }
 
 /** Fetch the list of linked bank items for the current user (no secrets). */
