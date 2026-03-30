@@ -2,6 +2,7 @@ import { Tabs, Redirect } from 'expo-router';
 import { ActivityIndicator, SafeAreaView, Text } from 'react-native';
 import { useAuth } from '@/context/AuthContext';
 import { TransactionProvider } from '@/context/TransactionContext';
+import { ActivityCategoriesProvider } from '@/context/ActivityCategoriesContext';
 import { Ionicons } from '@expo/vector-icons';
 
 export default function TabLayout() {
@@ -22,6 +23,7 @@ export default function TabLayout() {
 
   return (
     <TransactionProvider>
+    <ActivityCategoriesProvider>
     <Tabs screenOptions={{ headerShown: false }}>
       <Tabs.Screen
   name="goals"
@@ -75,6 +77,7 @@ export default function TabLayout() {
   }}
 />
     </Tabs>
+    </ActivityCategoriesProvider>
     </TransactionProvider>
   );
 }
