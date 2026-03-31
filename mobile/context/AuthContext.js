@@ -7,6 +7,8 @@ const AuthProvider = ({ children }) => {
     const [loading, setLoading] = useState(true);
     const [session, setSession] = useState(null);
     const [user, setUser] = useState(null);
+    /** Cleared after onboarding calls `updatePhone` or on signout / failed signup. Appwrite requires password to attach phone. */
+    const [pendingPhoneSetupPassword, setPendingPhoneSetupPassword] = useState(null);
 
     useEffect(() => {
         init();
@@ -50,6 +52,27 @@ const AuthProvider = ({ children }) => {
             throw error;
         }
     };
+
+    const rememberPasswordForPhoneSetup = (password) => {
+        setPendingPhoneSetupPassword(password);
+    };
+
+    const consumePasswordForPhoneSetup = () => {
+        const p = pendingPhoneSetupPassword;
+        setPendingPhoneSetupPassword(null);
+        return p;
+    };
+
+    const clearPasswordForPhoneSetup = () => {
+        setPendingPhoneSetupPassword(null);
+    };
+
+    const refreshUser = async () => {
+        const u = await account.get();
+        setUser(u);
+        return u;
+    };
+
     const signout = async () => {
         try {
             await account.deleteSession("current");
@@ -58,10 +81,21 @@ const AuthProvider = ({ children }) => {
         } finally {
             setSession(null);
             setUser(null);
+            setPendingPhoneSetupPassword(null);
         }
     };
 
-    const contextData = { loading, session, user, signin, signout };
+    const contextData = {
+        loading,
+        session,
+        user,
+        signin,
+        signout,
+        rememberPasswordForPhoneSetup,
+        consumePasswordForPhoneSetup,
+        clearPasswordForPhoneSetup,
+        refreshUser,
+    };
     return (
         <AuthContext.Provider value={contextData}>
             {children}
