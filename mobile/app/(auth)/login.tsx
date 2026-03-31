@@ -11,7 +11,7 @@ import TextCustom from '@/components/TextCustom';
 import { useAuth } from '@/context/AuthContext';
 
 export default function Login() {
-  const { signin: signIn } = useAuth();
+  const { signin: signIn, clearPasswordForPhoneSetup } = useAuth();
   const forgotSheetRef = useRef<BottomSheet>(null);
   const signupSheetRef = useRef<BottomSheet>(null);
 
@@ -35,6 +35,7 @@ export default function Login() {
     setSubmitting(true);
     try {
       await signIn({ email: nextEmail, password });
+      clearPasswordForPhoneSetup();
       router.replace('/(tabs)');
     } catch (e: any) {
       setError(e?.message ?? 'Login failed. Please try again.');
