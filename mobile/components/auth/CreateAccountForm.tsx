@@ -21,8 +21,7 @@ type CreateAccountFormProps = {
  * Owns its own state and Appwrite create + signin + redirect logic.
  */
 export default function CreateAccountForm({ onClose, prefilledEmail = '' }: CreateAccountFormProps) {
-  const { signin } = useAuth();
-  const [name, setName] = useState('');
+  const { signin, rememberPasswordForPhoneSetup, clearPasswordForPhoneSetup } = useAuth();
   const [email, setEmail] = useState(prefilledEmail);
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -40,15 +39,20 @@ export default function CreateAccountForm({ onClose, prefilledEmail = '' }: Crea
 
   const handleSignup = async () => {
     const nextEmail = email.trim().toLowerCase();
-    const nextName = name.trim();
 
     setError(null);
     setSubmitting(true);
     try {
-      await account.create(ID.unique(), nextEmail, password, nextName || undefined);
+      await account.create({
+        userId: ID.unique(),
+        email: nextEmail,
+        password,
+      });
       await signin({ email: nextEmail, password });
+      rememberPasswordForPhoneSetup(password);
       router.replace('/(onboarding)/(perms)/notification');
     } catch (e: any) {
+      clearPasswordForPhoneSetup();
       setError(e?.message ?? 'Signup failed. Please try again.');
     } finally {
       setSubmitting(false);
@@ -74,17 +78,6 @@ export default function CreateAccountForm({ onClose, prefilledEmail = '' }: Crea
       </View>
 
       {error ? <Text style={styles.errorText}>{error}</Text> : null}
-
-      <TextCustom>Name</TextCustom>
-      <BottomSheetTextInput
-        placeholder="Your name"
-        style={styles.input}
-        value={name}
-        onChangeText={setName}
-        autoCapitalize="words"
-        autoCorrect={false}
-        textContentType="name"
-      />
 
       <TextCustom>Email</TextCustom>
       <BottomSheetTextInput
