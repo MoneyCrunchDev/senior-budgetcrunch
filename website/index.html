@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Money Crunch</title>
+  <title>Money Crunch &middot; Green Budget App</title>
   <meta
     name="description"
-    content="Money Crunch is a budgeting app focused on intentional spending, habit awareness, and financial goal alignment."
+    content="Money Crunch is a mobile budgeting app focused on intentional spending, habit awareness, and financial goal alignment."
   >
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -17,81 +17,188 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header class="hero">
-    <div class="container">
-      <p class="eyebrow">Green Budget App</p>
-      <h1>Money Crunch</h1>
-      <p class="hero-copy">
-        A mobile budgeting app built to support intentional spending, habit awareness,
-        and financial goal alignment.
+  <main class="shell">
+    <section class="panel" aria-label="Money Crunch project landing page">
+
+      <!-- ============ TOP BAR ============ -->
+      <header class="topbar">
+        <div class="brand">
+          <span class="brand-mark" aria-hidden="true">$</span>
+          <div class="brand-text">
+            <p class="eyebrow">
+              Green Budget App
+              <span
+                class="swatch"
+                title="Project color: Green"
+                aria-label="Project color: Green"
+              ></span>
+            </p>
+            <h1>Money Crunch</h1>
+          </div>
+        </div>
+
+        <div class="meta">
+          <span class="chip">Project&nbsp;ID&nbsp;<b>#SP-26-Green Budget App</b></span>
+          <span class="chip">CSC&nbsp;4350 &middot; Sec&nbsp;010</span>
+          <span class="chip chip-accent">Spring&nbsp;2026</span>
+        </div>
+      </header>
+
+      <!-- ============ TAGLINE ============ -->
+      <p class="lede">
+        A mobile budgeting app built to support intentional spending, habit
+        awareness, and financial goal alignment&mdash;combining guided
+        onboarding, bank linking, transaction sync, and visual activity
+        views to help users understand their spending behavior.
       </p>
-      <div class="team-card">
-        <h2>Team</h2>
-        <p>Bryan Juarez H.</p>
-        <p>Bradley Walraven</p>
-        <p>Bryan Lopez</p>
-      </div>
-    </div>
-  </header>
 
-  <main>
-    <section class="about">
-      <div class="container section-block">
-        <div class="section-heading">
-          <p class="eyebrow">About The Project</p>
-          <h2>Helping users understand where their money goes and why</h2>
-        </div>
-        <p class="section-copy">
-          Money Crunch combines guided onboarding, bank-linking, transaction sync,
-          and visual activity views to help users better understand spending behavior.
-          The goal is to make budgeting feel practical, reflective, and easy to use.
-        </p>
-      </div>
-    </section>
+      <!-- ============ TEAM (small bio avatars) ============ -->
+      <section class="team-row" aria-label="Project team">
+        <h2 class="row-label">Team</h2>
+        <ul class="bios">
+          <li class="bio">
+            <span class="avatar" aria-hidden="true" data-color="a">BJ</span>
+            <div class="bio-text">
+              <span class="bio-name">Bryan Juarez H.</span>
+              <span class="bio-role">Developer</span>
+            </div>
+          </li>
+          <li class="bio">
+            <span class="avatar" aria-hidden="true" data-color="b">BW</span>
+            <div class="bio-text">
+              <span class="bio-name">Bradley Walraven</span>
+              <span class="bio-role">Developer</span>
+            </div>
+          </li>
+          <li class="bio">
+            <span class="avatar" aria-hidden="true" data-color="c">BL</span>
+            <div class="bio-text">
+              <span class="bio-name">Bryan Lopez</span>
+              <span class="bio-role">Developer</span>
+            </div>
+          </li>
+        </ul>
+      </section>
 
-    <section class="resources">
-      <div class="container">
-        <div class="section-heading">
-          <p class="eyebrow">Project Links</p>
-          <h2>Quick access to our final deliverables</h2>
-        </div>
+      <!-- ============ COLLAPSIBLES (compact, expandable) ============ -->
+      <section class="accordion" aria-label="More about the project">
+        <details class="acc-item">
+          <summary>
+            <span class="acc-title">About the project</span>
+            <span class="acc-icon" aria-hidden="true"></span>
+          </summary>
+          <div class="acc-body">
+            <p>
+              Money Crunch helps users connect their accounts, see real
+              transactions, and reflect on spending habits through a
+              friendly mobile experience. The app focuses on
+              <em>intentional</em> spending&mdash;not just tracking, but
+              understanding the &ldquo;why&rdquo; behind each purchase.
+            </p>
+          </div>
+        </details>
 
-        <div class="card-grid">
-          <a class="resource-card" href="https://docs.google.com/document/d/1-X-rsg109ra1Rg5Bg2fZrQ90B3aXuA5x0qEdPuxCjjM" aria-label="Final report link placeholder">
-            <span class="card-label">Final Report</span>
-            <h3>Read the full report</h3>
-            <p>Replace this placeholder with the hosted report URL.</p>
-            <span class="card-link">Open report link</span>
-          </a>
+        <details class="acc-item">
+          <summary>
+            <span class="acc-title">Development approach</span>
+            <span class="acc-icon" aria-hidden="true"></span>
+          </summary>
+          <div class="acc-body">
+            <ul class="dotlist">
+              <li>Agile sprints with weekly check-ins and shared task board</li>
+              <li>Mobile-first design, prototyped before implementation</li>
+              <li>Backend services for auth, account sync, and transactions</li>
+              <li>Iterative usability feedback from peer reviews</li>
+            </ul>
+          </div>
+        </details>
 
-          <a
-            class="resource-card"
-            href="https://github.com/MoneyCrunchDev/sp26-green-budgetapp"
-            target="_blank"
-            rel="noreferrer"
-          >
-            <span class="card-label">GitHub</span>
-            <h3>View the repository</h3>
-            <p>Browse the source code, project structure, and implementation details.</p>
-            <span class="card-link">Open GitHub</span>
-          </a>
+        <details class="acc-item">
+          <summary>
+            <span class="acc-title">Tech stack</span>
+            <span class="acc-icon" aria-hidden="true"></span>
+          </summary>
+          <div class="acc-body">
+            <ul class="pill-list">
+              <li>React Native</li>
+              <li>Node.js</li>
+              <li>Express</li>
+              <li>PostgreSQL</li>
+              <li>Plaid API</li>
+              <li>Figma</li>
+              <li>GitHub</li>
+            </ul>
+          </div>
+        </details>
 
-          <a class="resource-card" href="#" aria-label="Final presentation video link placeholder">
-            <span class="card-label">Presentation Video</span>
-            <h3>Watch the final presentation</h3>
-            <p>Replace this placeholder with your YouTube or Google Drive presentation link.</p>
-            <span class="card-link">Add video link</span>
-          </a>
-        </div>
-      </div>
+        <details class="acc-item">
+          <summary>
+            <span class="acc-title">Deliverables &amp; documents</span>
+            <span class="acc-icon" aria-hidden="true"></span>
+          </summary>
+          <div class="acc-body">
+            <ul class="doc-list">
+              <li>
+                <a href="documents/final-report.pdf" target="_blank" rel="noreferrer">
+                  Final Report (PDF)
+                </a>
+              </li>
+              <li>
+                <a href="documents/project-proposal.pdf" target="_blank" rel="noreferrer">
+                  Project Proposal (PDF)
+                </a>
+              </li>
+              <li>
+                <a href="documents/design-document.pdf" target="_blank" rel="noreferrer">
+                  Design Document (PDF)
+                </a>
+              </li>
+              <li>
+                <a href="documents/user-manual.pdf" target="_blank" rel="noreferrer">
+                  User Manual (PDF)
+                </a>
+              </li>
+            </ul>
+          </div>
+        </details>
+      </section>
+
+      <!-- ============ PRIMARY LINKS ============ -->
+      <nav class="links" aria-label="Primary deliverables">
+        <a class="link-card" href="documents/final-report.pdf" target="_blank" rel="noreferrer">
+          <span class="tag">Final Report</span>
+          <span class="title">Read the report (PDF)</span>
+          <span class="cta">Open PDF &rarr;</span>
+        </a>
+
+        <a
+          class="link-card"
+          href="https://github.com/MoneyCrunchDev/sp26-green-budgetapp"
+          target="_blank"
+          rel="noreferrer"
+        >
+          <span class="tag">GitHub</span>
+          <span class="title">View the repository</span>
+          <span class="cta">Open GitHub &rarr;</span>
+        </a>
+
+        <a
+          class="link-card"
+          href="https://www.youtube.com/"
+          target="_blank"
+          rel="noreferrer"
+        >
+          <span class="tag">Presentation</span>
+          <span class="title">Watch the narrated demo</span>
+          <span class="cta">Open video &rarr;</span>
+        </a>
+      </nav>
+
+      <!-- ============ FOOTER ============ -->
+      <footer class="panel-foot">
+        <span><strong>Money Crunch</strong></span>
+      </footer>
     </section>
   </main>
-
-  <footer class="site-footer">
-    <div class="container footer-content">
-      <p>Money Crunch Project Website</p>
-      <p>Course information placeholder - add course number, section, semester, and year.</p>
-    </div>
-  </footer>
 </body>
 </html>
