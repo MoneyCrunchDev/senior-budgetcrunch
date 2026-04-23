@@ -23,8 +23,7 @@ import {
   normalizeE164Key,
   usDisplayToE164,
 } from "@/lib/phoneE164";
-
-const GRID = 8;
+import { colors, fontSize, fontWeight, radius, spacing } from "@/theme";
 
 type Baseline = {
   name: string;
@@ -299,7 +298,7 @@ export default function Screen() {
   const phoneForDisplay = !editing && maskContact ? maskPhoneToLast4(draftPhone) : draftPhone;
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <ScrollView style={styles.scroll} contentContainerStyle={styles.container}>
       <Text style={styles.title}>Account Settings</Text>
 
       <View style={styles.card}>
@@ -310,8 +309,8 @@ export default function Screen() {
           <Switch
             value={editing}
             onValueChange={handleToggleEdit}
-            trackColor={{ false: "#D8DCE2", true: "#90D4A8" }}
-            thumbColor={editing ? "#2ECC71" : "#f4f3f4"}
+            trackColor={{ false: colors.borderStrong, true: colors.accent }}
+            thumbColor={editing ? colors.primary : colors.surface}
           />
         </View>
 
@@ -319,7 +318,7 @@ export default function Screen() {
           <Text style={styles.label}>Name</Text>
           <TextInput
             placeholder={baseline.name ? undefined : "Enter your name"}
-            placeholderTextColor="#999"
+            placeholderTextColor={colors.textPlaceholder}
             style={[styles.input, !editing && styles.inputReadonly]}
             value={draftName}
             onChangeText={setDraftName}
@@ -333,7 +332,7 @@ export default function Screen() {
           <View style={styles.inputWithEyeWrap}>
             <TextInput
               placeholder={baseline.email ? undefined : "Enter your email"}
-              placeholderTextColor="#999"
+              placeholderTextColor={colors.textPlaceholder}
               style={[
                 styles.input,
                 !editing && styles.inputReadonly,
@@ -356,7 +355,7 @@ export default function Screen() {
                 <Ionicons
                   name={maskContact ? "eye-off-outline" : "eye-outline"}
                   size={20}
-                  color="#666"
+                  color={colors.textMuted}
                 />
               </TouchableOpacity>
             ) : null}
@@ -375,7 +374,7 @@ export default function Screen() {
               placeholder={
                 baseline.phoneDisplay ? undefined : "Enter your phone number"
               }
-              placeholderTextColor="#999"
+              placeholderTextColor={colors.textPlaceholder}
               style={[
                 styles.input,
                 !editing && styles.inputReadonly,
@@ -396,7 +395,7 @@ export default function Screen() {
                 <Ionicons
                   name={maskContact ? "eye-off-outline" : "eye-outline"}
                   size={20}
-                  color="#666"
+                  color={colors.textMuted}
                 />
               </TouchableOpacity>
             ) : null}
@@ -425,7 +424,7 @@ export default function Screen() {
             disabled={submitting || !hasAnyDirty}
           >
             {submitting && !passwordModalVisible ? (
-              <ActivityIndicator color="#FFF" />
+              <ActivityIndicator color={colors.textOnPrimary} />
             ) : (
               <Text style={styles.primaryButtonText}>Save changes</Text>
             )}
@@ -468,7 +467,7 @@ export default function Screen() {
             <TextInput
               style={styles.modalInput}
               placeholder="Password"
-              placeholderTextColor="#999"
+              placeholderTextColor={colors.textPlaceholder}
               secureTextEntry
               value={passwordInput}
               onChangeText={setPasswordInput}
@@ -491,7 +490,7 @@ export default function Screen() {
                 disabled={submitting}
               >
                 {submitting ? (
-                  <ActivityIndicator color="#FFF" />
+                  <ActivityIndicator color={colors.textOnPrimary} />
                 ) : (
                   <Text style={styles.primaryButtonText}>Save</Text>
                 )}
@@ -514,81 +513,86 @@ export default function Screen() {
 }
 
 const styles = StyleSheet.create({
+  scroll: {
+    flex: 1,
+    backgroundColor: colors.screenBackground,
+  },
   container: {
-    padding: GRID * 2,
-    paddingTop: GRID * 6,
-    backgroundColor: "#F6F7F9",
+    flexGrow: 1,
+    padding: spacing.md,
+    paddingTop: spacing.xxxl,
+    backgroundColor: colors.screenBackground,
   },
 
   title: {
-    fontSize: 28,
-    fontWeight: "700",
-    marginBottom: GRID * 3,
-    color: "#111",
+    fontSize: fontSize.heroSm,
+    fontWeight: fontWeight.bold,
+    marginBottom: spacing.lg,
+    color: colors.textPrimary,
   },
 
   card: {
-    backgroundColor: "#FFF",
-    borderRadius: GRID * 1.5,
-    padding: GRID * 2,
-    marginBottom: GRID * 2,
+    backgroundColor: colors.surface,
+    borderRadius: radius.lg,
+    padding: spacing.md,
+    marginBottom: spacing.md,
     borderWidth: 1,
-    borderColor: "#E6E8EC",
+    borderColor: colors.border,
   },
 
   cardTitle: {
-    fontSize: 16,
-    fontWeight: "700",
-    marginBottom: GRID * 2,
-    color: "#111",
+    fontSize: fontSize.lg,
+    fontWeight: fontWeight.bold,
+    marginBottom: spacing.md,
+    color: colors.textPrimary,
   },
 
   editRow: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginBottom: GRID * 2,
-    paddingBottom: GRID * 2,
+    marginBottom: spacing.md,
+    paddingBottom: spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: "#EEF0F3",
+    borderBottomColor: colors.divider,
   },
 
   editLabel: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#111",
+    fontSize: fontSize.lg,
+    fontWeight: fontWeight.semibold,
+    color: colors.textPrimary,
   },
 
   field: {
-    marginBottom: GRID * 2,
+    marginBottom: spacing.md,
   },
 
   label: {
-    fontSize: 14,
-    fontWeight: "600",
-    marginBottom: GRID,
-    color: "#333",
+    fontSize: fontSize.base,
+    fontWeight: fontWeight.semibold,
+    marginBottom: spacing.xs,
+    color: colors.textSecondary,
   },
 
   hint: {
-    fontSize: 12,
-    color: "#666",
-    marginTop: GRID,
+    fontSize: fontSize.sm,
+    color: colors.textMuted,
+    marginTop: spacing.xs,
   },
 
   input: {
-    height: GRID * 6,
+    height: spacing.xxxl,
     borderWidth: 1,
-    borderColor: "#D8DCE2",
-    borderRadius: GRID,
-    paddingHorizontal: GRID * 1.5,
-    fontSize: 16,
-    backgroundColor: "#FFF",
-    color: "#111",
+    borderColor: colors.borderStrong,
+    borderRadius: radius.md,
+    paddingHorizontal: spacing.sm,
+    fontSize: fontSize.lg,
+    backgroundColor: colors.surface,
+    color: colors.textPrimary,
   },
 
   inputRightPadForEye: {
-    paddingRight: GRID * 3.5,
+    paddingRight: spacing.lg + spacing.xxs,
   },
 
   inputWithEyeWrap: {
@@ -597,61 +601,61 @@ const styles = StyleSheet.create({
 
   eyeButtonInsideInput: {
     position: "absolute",
-    right: GRID * 1,
-    top: GRID * 2.05,
-    width: GRID * 2.25,
-    height: GRID * 2.25,
+    right: spacing.xs,
+    top: 16.4,
+    width: 18,
+    height: 18,
     alignItems: "center",
     justifyContent: "center",
   },
 
   inputReadonly: {
-    backgroundColor: "#F2F3F5",
-    color: "#333",
+    backgroundColor: colors.surfaceMuted,
+    color: colors.textSecondary,
   },
 
   errorText: {
-    color: "#b00020",
+    color: colors.danger,
     fontSize: 13,
-    marginTop: GRID,
+    marginTop: spacing.xs,
   },
 
   rowButton: {
-    height: GRID * 6,
+    height: spacing.xxxl,
     borderWidth: 1,
-    borderColor: "#E6E8EC",
-    borderRadius: GRID,
-    paddingHorizontal: GRID * 2,
-    marginBottom: GRID * 1.5,
-    backgroundColor: "#FFF",
+    borderColor: colors.border,
+    borderRadius: radius.md,
+    paddingHorizontal: spacing.md,
+    marginBottom: spacing.sm,
+    backgroundColor: colors.surface,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
   },
 
   rowButtonText: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#111",
+    fontSize: fontSize.lg,
+    fontWeight: fontWeight.semibold,
+    color: colors.textPrimary,
   },
 
   chevron: {
     fontSize: 22,
-    color: "#999",
-    marginLeft: GRID,
+    color: colors.textPlaceholder,
+    marginLeft: spacing.xs,
     lineHeight: 22,
   },
 
   editActions: {
     flexDirection: "row",
-    gap: GRID * 1.5,
-    marginBottom: GRID * 3,
+    gap: spacing.sm,
+    marginBottom: spacing.lg,
   },
 
   primaryButton: {
-    height: GRID * 7,
-    borderRadius: GRID,
-    backgroundColor: "#2ECC71",
+    height: spacing.xxl + spacing.md,
+    borderRadius: radius.md,
+    backgroundColor: colors.primary,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -661,26 +665,26 @@ const styles = StyleSheet.create({
   },
 
   secondaryButton: {
-    height: GRID * 7,
-    paddingHorizontal: GRID * 2,
-    borderRadius: GRID,
+    height: spacing.xxl + spacing.md,
+    paddingHorizontal: spacing.md,
+    borderRadius: radius.md,
     borderWidth: 1,
-    borderColor: "#D8DCE2",
+    borderColor: colors.borderStrong,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#FFF",
+    backgroundColor: colors.surface,
   },
 
   secondaryButtonText: {
-    color: "#333",
-    fontSize: 16,
-    fontWeight: "700",
+    color: colors.textSecondary,
+    fontSize: fontSize.lg,
+    fontWeight: fontWeight.bold,
   },
 
   primaryButtonText: {
-    color: "#FFF",
-    fontSize: 18,
-    fontWeight: "800",
+    color: colors.textOnPrimary,
+    fontSize: fontSize.xl,
+    fontWeight: fontWeight.extrabold,
   },
 
   buttonDisabled: {
@@ -689,59 +693,61 @@ const styles = StyleSheet.create({
 
   modalOverlay: {
     flex: 1,
-    backgroundColor: "rgba(0,0,0,0.45)",
+    backgroundColor: colors.overlay,
     justifyContent: "center",
-    padding: GRID * 3,
+    padding: spacing.lg,
   },
 
   modalCard: {
-    backgroundColor: "#FFF",
-    borderRadius: GRID * 1.5,
-    padding: GRID * 3,
+    backgroundColor: colors.surface,
+    borderRadius: radius.lg,
+    padding: spacing.lg,
   },
 
   modalTitle: {
-    fontSize: 18,
-    fontWeight: "700",
-    marginBottom: GRID,
-    color: "#111",
+    fontSize: fontSize.xl,
+    fontWeight: fontWeight.bold,
+    marginBottom: spacing.xs,
+    color: colors.textPrimary,
   },
 
   modalBody: {
-    fontSize: 14,
-    color: "#555",
-    marginBottom: GRID * 2,
+    fontSize: fontSize.base,
+    color: colors.textSecondary,
+    marginBottom: spacing.md,
     lineHeight: 20,
   },
 
   modalInput: {
     borderWidth: 1,
-    borderColor: "#D8DCE2",
-    borderRadius: GRID,
-    paddingHorizontal: GRID * 1.5,
-    paddingVertical: GRID * 1.5,
-    fontSize: 16,
-    marginBottom: GRID * 2,
+    borderColor: colors.borderStrong,
+    borderRadius: radius.md,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.sm,
+    fontSize: fontSize.lg,
+    marginBottom: spacing.md,
+    backgroundColor: colors.surface,
+    color: colors.textPrimary,
   },
 
   modalActions: {
     flexDirection: "row",
     justifyContent: "flex-end",
-    gap: GRID * 1.5,
+    gap: spacing.sm,
     alignItems: "center",
   },
 
   modalSecondary: {
-    paddingVertical: GRID * 1.5,
-    paddingHorizontal: GRID * 2,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.md,
   },
 
   modalPrimary: {
     minWidth: 100,
-    height: GRID * 6,
-    paddingHorizontal: GRID * 2,
-    borderRadius: GRID,
-    backgroundColor: "#2ECC71",
+    height: spacing.xxxl,
+    paddingHorizontal: spacing.md,
+    borderRadius: radius.md,
+    backgroundColor: colors.primary,
     alignItems: "center",
     justifyContent: "center",
   },

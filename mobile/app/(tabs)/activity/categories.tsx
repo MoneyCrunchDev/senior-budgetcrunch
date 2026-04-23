@@ -25,7 +25,7 @@ import {
   View,
 } from "react-native";
 
-const GRID = 8;
+import { colors, fontSize, fontWeight, radius, spacing } from "@/theme";
 
 function formatMoney(value: number): string {
   return `$${value.toFixed(2)}`;
@@ -99,7 +99,7 @@ function CategoryCard({
                 styles.progressFill,
                 {
                   width: `${percent}%`,
-                  backgroundColor: percent >= 100 ? "#E53935" : "#2ECC71",
+                  backgroundColor: percent >= 100 ? colors.danger : colors.primary,
                 },
               ]}
             />
@@ -129,7 +129,7 @@ function BudgetFormSheetContent({
   onSave: (id: string, v: { budget: number; color: string }) => void;
 }) {
   const [budgetStr, setBudgetStr] = useState("");
-  const [color, setColor] = useState(CHART_PALETTE[0] ?? "#4CAF50");
+  const [color, setColor] = useState(CHART_PALETTE[0] ?? colors.primary);
 
   useEffect(() => {
     if (category) {
@@ -164,7 +164,7 @@ function BudgetFormSheetContent({
         value={budgetStr}
         onChangeText={setBudgetStr}
         placeholder="0"
-        placeholderTextColor="#9CA3AF"
+        placeholderTextColor={colors.textPlaceholder}
         keyboardType="decimal-pad"
       />
 
@@ -234,14 +234,14 @@ export default function Screen() {
   if (!ready) {
     return (
       <View style={styles.loadingWrap}>
-        <ActivityIndicator size="large" color="#111" />
+        <ActivityIndicator size="large" color={colors.primary} />
       </View>
     );
   }
 
   return (
     <View style={styles.screenRoot}>
-      <ScrollView contentContainerStyle={styles.container}>
+      <ScrollView style={styles.scroll} contentContainerStyle={styles.container}>
         <View style={styles.header}>
           <Text style={styles.title}>Categories</Text>
         </View>
@@ -291,161 +291,166 @@ const styles = StyleSheet.create({
   screenRoot: {
     flex: 1,
   },
+  scroll: {
+    flex: 1,
+    backgroundColor: colors.screenBackground,
+  },
 
   loadingWrap: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#F6F7F9",
+    backgroundColor: colors.screenBackground,
   },
 
   container: {
-    paddingHorizontal: GRID * 2,
-    paddingTop: GRID * 6,
-    paddingBottom: GRID * 4,
-    backgroundColor: "#F6F7F9",
+    flexGrow: 1,
+    paddingHorizontal: spacing.md,
+    paddingTop: spacing.xxxl,
+    paddingBottom: spacing.xl,
+    backgroundColor: colors.screenBackground,
   },
 
   header: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginBottom: GRID * 3,
+    marginBottom: spacing.lg,
   },
 
   title: {
-    fontSize: 28,
-    fontWeight: "700",
-    color: "#111",
+    fontSize: fontSize.heroSm,
+    fontWeight: fontWeight.bold,
+    color: colors.textPrimary,
   },
 
   sectionLabel: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: "#6B7280",
-    marginBottom: GRID * 2,
+    fontSize: fontSize.base,
+    fontWeight: fontWeight.semibold,
+    color: colors.textMuted,
+    marginBottom: spacing.md,
   },
 
   list: {
-    gap: GRID * 2,
+    gap: spacing.md,
   },
 
   emptyCard: {
-    backgroundColor: "#FFF",
-    padding: GRID * 3,
-    borderRadius: GRID,
+    backgroundColor: colors.surface,
+    padding: spacing.lg,
+    borderRadius: radius.md,
     borderWidth: 1,
-    borderColor: "#E6E8EC",
+    borderColor: colors.border,
   },
 
   emptyText: {
-    fontSize: 15,
-    color: "#666",
+    fontSize: fontSize.md,
+    color: colors.textMuted,
     textAlign: "center",
-    marginBottom: GRID,
+    marginBottom: spacing.xs,
   },
 
   emptyHint: {
-    fontSize: 13,
-    color: "#999",
+    fontSize: fontSize.sm,
+    color: colors.textPlaceholder,
     textAlign: "center",
   },
 
   card: {
-    backgroundColor: "#FFFFFF",
-    borderRadius: GRID * 1.5,
-    padding: GRID * 2,
+    backgroundColor: colors.surface,
+    borderRadius: radius.lg,
+    padding: spacing.md,
     borderWidth: 1,
-    borderColor: "#E6E8EC",
+    borderColor: colors.border,
   },
 
   cardTopRow: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginBottom: GRID * 2,
+    marginBottom: spacing.md,
   },
 
   cardTitleWrap: {
     flex: 1,
-    marginRight: GRID * 2,
+    marginRight: spacing.md,
   },
 
   nameRow: {
     flexDirection: "row",
     alignItems: "center",
-    gap: GRID,
+    gap: spacing.xs,
   },
 
   colorSwatchSmall: {
-    width: GRID * 1.5,
-    height: GRID * 1.5,
-    borderRadius: GRID,
+    width: spacing.sm,
+    height: spacing.sm,
+    borderRadius: radius.md,
     borderWidth: 1,
-    borderColor: "#E6E8EC",
+    borderColor: colors.border,
   },
 
   cardTitle: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: "#111",
+    fontSize: fontSize.xl,
+    fontWeight: fontWeight.bold,
+    color: colors.textPrimary,
     flex: 1,
   },
 
   editButton: {
-    height: GRID * 4,
-    paddingHorizontal: GRID * 1.5,
-    borderRadius: GRID,
-    backgroundColor: "#F8F9FB",
+    height: spacing.xl,
+    paddingHorizontal: spacing.sm,
+    borderRadius: radius.md,
+    backgroundColor: colors.surfaceAlt,
     borderWidth: 1,
-    borderColor: "#E6E8EC",
+    borderColor: colors.border,
     alignItems: "center",
     justifyContent: "center",
   },
 
   editButtonText: {
-    fontSize: 12,
-    fontWeight: "700",
-    color: "#111",
+    fontSize: fontSize.sm,
+    fontWeight: fontWeight.bold,
+    color: colors.textPrimary,
   },
 
   amountRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: GRID,
+    marginBottom: spacing.xs,
   },
 
   spentText: {
-    fontSize: 14,
-    fontWeight: "700",
-    color: "#111",
+    fontSize: fontSize.base,
+    fontWeight: fontWeight.bold,
+    color: colors.textPrimary,
   },
 
   budgetText: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: "#6B7280",
+    fontSize: fontSize.base,
+    fontWeight: fontWeight.semibold,
+    color: colors.textMuted,
   },
 
   noBudgetText: {
-    fontSize: 13,
-    fontWeight: "600",
-    color: "#9CA3AF",
+    fontSize: fontSize.sm,
+    fontWeight: fontWeight.semibold,
+    color: colors.textPlaceholder,
     fontStyle: "italic",
   },
 
   progressTrack: {
-    height: GRID * 1.5,
-    borderRadius: GRID,
-    backgroundColor: "#E9EDF2",
+    height: spacing.sm,
+    borderRadius: radius.md,
+    backgroundColor: colors.divider,
     overflow: "hidden",
-    marginBottom: GRID,
+    marginBottom: spacing.xs,
   },
 
   progressFill: {
     height: "100%",
-    borderRadius: GRID,
+    borderRadius: radius.md,
   },
 
   footerRow: {
@@ -455,110 +460,110 @@ const styles = StyleSheet.create({
   },
 
   remainingText: {
-    fontSize: 12,
-    fontWeight: "600",
-    color: "#6B7280",
+    fontSize: fontSize.sm,
+    fontWeight: fontWeight.semibold,
+    color: colors.textMuted,
   },
 
   percentText: {
-    fontSize: 12,
-    fontWeight: "700",
-    color: "#111",
+    fontSize: fontSize.sm,
+    fontWeight: fontWeight.bold,
+    color: colors.textPrimary,
   },
 
   sheetTitle: {
-    fontSize: 20,
-    fontWeight: "800",
-    color: "#111",
-    marginBottom: GRID,
+    fontSize: fontSize.xxl,
+    fontWeight: fontWeight.extrabold,
+    color: colors.textPrimary,
+    marginBottom: spacing.xs,
   },
 
   sheetCategoryName: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: "#333",
-    marginBottom: GRID / 2,
+    fontSize: fontSize.lg,
+    fontWeight: fontWeight.bold,
+    color: colors.textSecondary,
+    marginBottom: spacing.xxs,
   },
 
   sheetSpentLabel: {
     fontSize: 13,
-    fontWeight: "600",
-    color: "#6B7280",
-    marginBottom: GRID * 2,
+    fontWeight: fontWeight.semibold,
+    color: colors.textMuted,
+    marginBottom: spacing.md,
   },
 
   fieldLabel: {
-    fontSize: 12,
-    fontWeight: "700",
-    color: "#6B7280",
-    marginBottom: GRID / 2,
+    fontSize: fontSize.sm,
+    fontWeight: fontWeight.bold,
+    color: colors.textMuted,
+    marginBottom: spacing.xxs,
   },
 
   input: {
     borderWidth: 1,
-    borderColor: "#E6E8EC",
-    borderRadius: GRID,
-    paddingHorizontal: GRID * 1.5,
-    paddingVertical: GRID * 1.25,
-    fontSize: 16,
-    color: "#111",
-    marginBottom: GRID * 1.5,
-    backgroundColor: "#FAFBFC",
+    borderColor: colors.border,
+    borderRadius: radius.md,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 10,
+    fontSize: fontSize.lg,
+    color: colors.textPrimary,
+    marginBottom: spacing.sm,
+    backgroundColor: colors.surfaceAlt,
   },
 
   colorRow: {
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: GRID,
-    marginBottom: GRID * 2,
+    gap: spacing.xs,
+    marginBottom: spacing.md,
   },
 
   colorChoice: {
-    width: GRID * 4,
-    height: GRID * 4,
-    borderRadius: GRID * 2,
+    width: spacing.xl,
+    height: spacing.xl,
+    borderRadius: radius.pill,
     borderWidth: 2,
-    borderColor: "transparent",
+    borderColor: colors.transparent,
   },
 
   colorChoiceSelected: {
-    borderColor: "#111",
+    borderColor: colors.textPrimary,
   },
 
   sheetActions: {
     flexDirection: "row",
-    gap: GRID * 1.5,
-    marginTop: GRID,
+    gap: spacing.sm,
+    marginTop: spacing.xs,
   },
 
   sheetCancel: {
     flex: 1,
-    height: GRID * 6,
-    borderRadius: GRID,
+    height: spacing.xxxl,
+    borderRadius: radius.md,
     borderWidth: 1,
-    borderColor: "#D8DCE2",
+    borderColor: colors.borderStrong,
     alignItems: "center",
     justifyContent: "center",
   },
 
   sheetCancelText: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: "#111",
+    fontSize: fontSize.lg,
+    fontWeight: fontWeight.bold,
+    color: colors.textPrimary,
   },
 
   sheetSave: {
     flex: 1,
-    height: GRID * 6,
-    borderRadius: GRID,
-    backgroundColor: "#111",
+    height: spacing.xxxl,
+    borderRadius: radius.md,
+    backgroundColor: colors.primary,
     alignItems: "center",
     justifyContent: "center",
   },
 
   sheetSaveText: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: "#FFFFFF",
+    fontSize: fontSize.lg,
+    fontWeight: fontWeight.bold,
+    color: colors.textOnPrimary,
   },
 });

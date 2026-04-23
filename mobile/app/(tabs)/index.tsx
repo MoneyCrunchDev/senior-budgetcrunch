@@ -29,6 +29,7 @@ import {
   findNearbyHeatmapTransactions,
 } from "@/lib/transactionLocation";
 import type { Transaction } from "@/lib/plaidApi";
+import { colors, fontSize, fontWeight, radius, spacing } from "@/theme";
 
 const token = process.env.EXPO_PUBLIC_MAPBOX_TOKEN;
 if (token) Mapbox.setAccessToken(token);
@@ -331,9 +332,9 @@ export default function Index() {
             accessibilityRole="button"
           >
             {syncing ? (
-              <ActivityIndicator size="small" color="#0A6EF2" />
+              <ActivityIndicator size="small" color={colors.textPrimary} />
             ) : (
-              <Ionicons name="refresh-outline" size={26} color="#0A6EF2" />
+              <Ionicons name="refresh-outline" size={26} color={colors.textPrimary} />
             )}
           </TouchableOpacity>
         </View>
@@ -348,7 +349,7 @@ export default function Index() {
             accessibilityLabel="Purchases without map location"
             accessibilityRole="button"
           >
-            <Ionicons name="mail-outline" size={26} color="#333" />
+            <Ionicons name="mail-outline" size={26} color={colors.textPrimary} />
             {hasNewUntrackedBadge && (
               <View style={styles.envelopeBadge} accessibilityLabel="New items" />
             )}
@@ -364,13 +365,13 @@ export default function Index() {
           accessibilityLabel="Center map on my location"
           accessibilityRole="button"
         >
-          <Ionicons name="navigate-outline" size={25} color="#0A6EF2" />
+          <Ionicons name="navigate-outline" size={25} color={colors.textPrimary} />
         </TouchableOpacity>
       )}
 
       {checking && (
         <View style={styles.overlay}>
-          <ActivityIndicator size="large" color="#333" />
+          <ActivityIndicator size="large" color={colors.primary} />
           <Text style={styles.overlayText}>Requesting location access\u2026</Text>
         </View>
       )}
@@ -442,15 +443,15 @@ const styles = StyleSheet.create({
   },
   heatmapHint: {
     position: "absolute",
-    left: 12,
-    right: 12,
-    backgroundColor: "rgba(255,255,255,0.94)",
+    left: spacing.sm,
+    right: spacing.sm,
+    backgroundColor: colors.surface,
     paddingVertical: 10,
-    paddingHorizontal: 12,
+    paddingHorizontal: spacing.sm,
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: "#E6E8EC",
-    shadowColor: "#000",
+    borderColor: colors.border,
+    shadowColor: colors.shadow,
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.12,
     shadowRadius: 3,
@@ -458,13 +459,13 @@ const styles = StyleSheet.create({
   },
   heatmapHintText: {
     fontSize: 13,
-    color: "#333",
+    color: colors.textPrimary,
     lineHeight: 18,
     textAlign: "center",
   },
   refreshFabWrap: {
     position: "absolute",
-    left: 16,
+    left: spacing.md,
     zIndex: 20,
     elevation: 20,
   },
@@ -472,23 +473,23 @@ const styles = StyleSheet.create({
     width: ENVELOPE_FAB_SIZE,
     height: ENVELOPE_FAB_SIZE,
     borderRadius: ENVELOPE_FAB_SIZE / 2,
-    backgroundColor: "#fff",
+    backgroundColor: colors.surface,
     justifyContent: "center",
     alignItems: "center",
-    shadowColor: "#000",
+    shadowColor: colors.shadow,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 4,
     elevation: 6,
     borderWidth: 1,
-    borderColor: "#E6E8EC",
+    borderColor: colors.border,
   },
   refreshFabDisabled: {
     opacity: 0.75,
   },
   envelopeFabWrap: {
     position: "absolute",
-    right: 16,
+    right: spacing.md,
     zIndex: 20,
     elevation: 20,
   },
@@ -496,16 +497,16 @@ const styles = StyleSheet.create({
     width: ENVELOPE_FAB_SIZE,
     height: ENVELOPE_FAB_SIZE,
     borderRadius: ENVELOPE_FAB_SIZE / 2,
-    backgroundColor: "#fff",
+    backgroundColor: colors.surface,
     justifyContent: "center",
     alignItems: "center",
-    shadowColor: "#000",
+    shadowColor: colors.shadow,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 4,
     elevation: 6,
     borderWidth: 1,
-    borderColor: "#E6E8EC",
+    borderColor: colors.border,
   },
   envelopeBadge: {
     position: "absolute",
@@ -514,63 +515,65 @@ const styles = StyleSheet.create({
     width: 10,
     height: 10,
     borderRadius: 5,
-    backgroundColor: "#E53935",
+    backgroundColor: colors.danger,
     borderWidth: 2,
-    borderColor: "#fff",
+    borderColor: colors.surface,
   },
   recenterFab: {
     position: "absolute",
-    right: 16,
+    right: spacing.md,
     width: 50,
     height: 50,
     borderRadius: 26,
-    backgroundColor: "#fff",
+    backgroundColor: colors.surface,
     justifyContent: "center",
     alignItems: "center",
-    shadowColor: "#000",
+    shadowColor: colors.shadow,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 4,
     elevation: 4,
     borderWidth: 1,
-    borderColor: "#E6E8EC",
+    borderColor: colors.border,
   },
   overlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(255,255,255,0.85)",
+    backgroundColor: colors.overlayLight,
     justifyContent: "center",
     alignItems: "center",
   },
   overlayText: {
-    marginTop: 12,
-    fontSize: 16,
-    color: "#333",
+    marginTop: spacing.sm,
+    fontSize: fontSize.lg,
+    color: colors.textSecondary,
   },
   banner: {
     position: "absolute",
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: "rgba(0,0,0,0.85)",
+    backgroundColor: colors.surface,
     paddingVertical: 14,
-    paddingHorizontal: 16,
+    paddingHorizontal: spacing.md,
     paddingBottom: 28,
   },
   bannerText: {
-    color: "#fff",
-    fontSize: 14,
+    color: colors.textPrimary,
+    fontSize: fontSize.base,
     marginBottom: 10,
   },
   settingsButton: {
     alignSelf: "flex-start",
-    paddingVertical: 8,
+    paddingVertical: spacing.xs,
     paddingHorizontal: 14,
-    backgroundColor: "#fff",
-    borderRadius: 8,
+    backgroundColor: colors.surfaceMuted,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: radius.md,
   },
   settingsButtonText: {
-    color: "#000",
-    fontSize: 15,
-    fontWeight: "600",
+    color: colors.textPrimary,
+    fontSize: fontSize.md,
+    fontWeight: fontWeight.semibold,
   },
 });

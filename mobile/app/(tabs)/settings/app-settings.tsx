@@ -5,18 +5,15 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Switch,
   ActivityIndicator,
 } from "react-native";
 import { useAuth } from "@/context/AuthContext";
 import { useTransactions } from "@/context/TransactionContext";
-
-const GRID = 8;
+import { colors, fontSize, fontWeight, radius, spacing } from "@/theme";
 
 export default function Screen() {
   const { signout } = useAuth();
   const { syncing, syncAndRefresh } = useTransactions();
-  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [syncDoneShown, setSyncDoneShown] = useState(false);
 
   useEffect(() => {
@@ -26,20 +23,11 @@ export default function Screen() {
   }, [syncDoneShown]);
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <ScrollView
+      style={styles.scroll}
+      contentContainerStyle={styles.container}
+    >
       <Text style={styles.title}>App Settings</Text>
-
-      {/* Notifications */}
-      {/* <View style={styles.card}>
-        <View style={styles.row}>
-          <Text style={styles.rowText}>Notifications</Text>
-
-          <Switch
-            value={notificationsEnabled}
-            onValueChange={() => setNotificationsEnabled(!notificationsEnabled)}
-          />
-        </View>
-      </View> */}
 
       {/* Sync transactions — backup when pull-to-refresh isn't available */}
       <View style={styles.card}>
@@ -60,20 +48,12 @@ export default function Screen() {
             {syncing ? "Syncing…" : syncDoneShown ? "Done" : "Sync transactions"}
           </Text>
           {syncing ? (
-            <ActivityIndicator size="small" color="#666" />
+            <ActivityIndicator size="small" color={colors.textMuted} />
           ) : (
             <Text style={styles.chevron}>›</Text>
           )}
         </TouchableOpacity>
       </View>
-
-      {/* Support */}
-      {/* <View style={styles.card}>
-        <TouchableOpacity style={styles.row}>
-          <Text style={styles.rowText}>Contact Support</Text>
-          <Text style={styles.chevron}>›</Text>
-        </TouchableOpacity>
-      </View> */}
 
       {/* Logout */}
       <View style={styles.card}>
@@ -86,53 +66,58 @@ export default function Screen() {
 }
 
 const styles = StyleSheet.create({
+  scroll: {
+    flex: 1,
+    backgroundColor: colors.screenBackground,
+  },
   container: {
-    padding: GRID * 2, // 16
-    paddingTop: GRID * 6, // 48
-    backgroundColor: "#F6F7F9",
+    flexGrow: 1,
+    padding: spacing.md,
+    paddingTop: spacing.xxxl,
+    backgroundColor: colors.screenBackground,
   },
 
   title: {
-    fontSize: 28,
-    fontWeight: "700",
-    marginBottom: GRID * 3, // 24
-    color: "#111",
+    fontSize: fontSize.heroSm,
+    fontWeight: fontWeight.bold,
+    marginBottom: spacing.lg,
+    color: colors.textPrimary,
   },
 
   card: {
-    backgroundColor: "#FFF",
-    borderRadius: GRID * 1.5, // 12
-    paddingHorizontal: GRID * 2, // 16
-    marginBottom: GRID * 2, // 16
+    backgroundColor: colors.surface,
+    borderRadius: radius.lg,
+    paddingHorizontal: spacing.md,
+    marginBottom: spacing.md,
     borderWidth: 1,
-    borderColor: "#E6E8EC",
+    borderColor: colors.border,
   },
 
   row: {
-    height: GRID * 7, // 56
+    height: spacing.xxl + spacing.md,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
   },
 
   rowText: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#111",
+    fontSize: fontSize.lg,
+    fontWeight: fontWeight.semibold,
+    color: colors.textPrimary,
   },
 
   syncDisabled: {
-    color: "#999",
+    color: colors.textPlaceholder,
   },
 
   chevron: {
     fontSize: 22,
-    color: "#999",
+    color: colors.textPlaceholder,
   },
 
   logoutText: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: "#E53935",
+    fontSize: fontSize.lg,
+    fontWeight: fontWeight.bold,
+    color: colors.danger,
   },
 });

@@ -17,8 +17,7 @@ import ModalBottomSheet from "@/components/ModalBottomSheet";
 import { useTransactions } from "@/context/TransactionContext";
 import { getLinkedItems, type LinkedItem, type Transaction } from "@/lib/plaidApi";
 import { getPrimaryLabel, getDetailedLabel } from "@/lib/categoryHelpers";
-
-const GRID = 8;
+import { colors, fontSize, fontWeight, radius, spacing } from "@/theme";
 const MONTHS = [
   "January", "February", "March", "April", "May", "June",
   "July", "August", "September", "October", "November", "December",
@@ -273,7 +272,7 @@ export default function TransactionsScreen() {
 
   if (linkedItems.length === 0 && !loading) {
     return (
-      <ScrollView contentContainerStyle={styles.container}>
+      <ScrollView style={styles.scroll} contentContainerStyle={styles.container}>
         <Text style={styles.emptyText}>No bank accounts linked.</Text>
         <TouchableOpacity
           style={styles.linkButton}
@@ -288,6 +287,7 @@ export default function TransactionsScreen() {
   return (
     <>
     <ScrollView
+      style={styles.scroll}
       contentContainerStyle={styles.container}
       refreshControl={
         <RefreshControl refreshing={syncing} onRefresh={syncAndRefresh} />
@@ -302,7 +302,7 @@ export default function TransactionsScreen() {
         <Text style={styles.accountLabel} numberOfLines={1}>
           {accountLabel}
         </Text>
-        <Ionicons name="chevron-down" size={18} color="#666" />
+        <Ionicons name="chevron-down" size={18} color={colors.textMuted} />
       </TouchableOpacity>
 
       {showAccountPicker && (
@@ -359,11 +359,11 @@ export default function TransactionsScreen() {
         {!viewAllMonths && (
           <View style={styles.monthNav}>
             <TouchableOpacity onPress={prevMonth} style={styles.monthArrow}>
-              <Ionicons name="chevron-back" size={22} color="#333" />
+              <Ionicons name="chevron-back" size={22} color={colors.textSecondary} />
             </TouchableOpacity>
             <Text style={styles.monthLabel}>{monthLabel}</Text>
             <TouchableOpacity onPress={nextMonth} style={styles.monthArrow}>
-              <Ionicons name="chevron-forward" size={22} color="#333" />
+              <Ionicons name="chevron-forward" size={22} color={colors.textSecondary} />
             </TouchableOpacity>
           </View>
         )}
@@ -379,20 +379,20 @@ export default function TransactionsScreen() {
           <Text style={styles.sortLabel} numberOfLines={1}>
             {SORT_LABELS[sortBy]}
           </Text>
-          <Ionicons name="chevron-down" size={16} color="#666" />
+          <Ionicons name="chevron-down" size={16} color={colors.textMuted} />
         </TouchableOpacity>
 
         <View style={styles.searchWrap}>
           <TextInput
             style={styles.searchInput}
             placeholder="Search"
-            placeholderTextColor="#999"
+            placeholderTextColor={colors.textPlaceholder}
             value={searchQuery}
             onChangeText={setSearchQuery}
             autoCapitalize="none"
             autoCorrect={false}
           />
-          <Ionicons name="search" size={18} color="#888" style={styles.searchIcon} />
+          <Ionicons name="search" size={18} color={colors.textMuted} style={styles.searchIcon} />
         </View>
       </View>
 
@@ -423,7 +423,7 @@ export default function TransactionsScreen() {
       ) : null}
 
       {loading ? (
-        <ActivityIndicator size="large" style={{ marginTop: GRID * 4 }} />
+        <ActivityIndicator size="large" color={colors.primary} style={{ marginTop: spacing.xl }} />
       ) : filteredSortedAndGrouped.length === 0 ? (
         <View style={styles.emptyCard}>
           <Text style={styles.emptyText}>
@@ -456,7 +456,7 @@ export default function TransactionsScreen() {
                 activeOpacity={0.7}
               >
                 <View style={styles.rowIcon}>
-                  <Ionicons name="receipt-outline" size={22} color="#444" />
+                  <Ionicons name="receipt-outline" size={22} color={colors.textSecondary} />
                 </View>
                 <View style={styles.rowBody}>
                   <Text style={styles.rowName} numberOfLines={1}>
@@ -473,7 +473,7 @@ export default function TransactionsScreen() {
                   <Text style={styles.rowAmount}>
                     {formatAmount(t.amount)}
                   </Text>
-                  <Ionicons name="chevron-forward" size={18} color="#999" />
+                  <Ionicons name="chevron-forward" size={18} color={colors.textPlaceholder} />
                 </View>
               </TouchableOpacity>
             ))}
@@ -499,223 +499,228 @@ export default function TransactionsScreen() {
 }
 
 const styles = StyleSheet.create({
+  scroll: {
+    flex: 1,
+    backgroundColor: colors.screenBackground,
+  },
   container: {
-    padding: GRID * 2,
-    paddingTop: GRID * 2,
-    backgroundColor: "#F6F7F9",
-    paddingBottom: GRID * 6,
+    flexGrow: 1,
+    padding: spacing.md,
+    paddingTop: spacing.md,
+    backgroundColor: colors.screenBackground,
+    paddingBottom: spacing.xxxl,
   },
   centered: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    padding: GRID * 2,
+    padding: spacing.md,
   },
   accountRow: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    backgroundColor: "#FFF",
-    paddingVertical: GRID * 1.5,
-    paddingHorizontal: GRID * 2,
-    borderRadius: GRID,
+    backgroundColor: colors.surface,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.md,
+    borderRadius: radius.md,
     borderWidth: 1,
-    borderColor: "#E6E8EC",
-    marginBottom: GRID * 2,
+    borderColor: colors.border,
+    marginBottom: spacing.md,
   },
   accountLabel: {
-    fontSize: 15,
-    fontWeight: "600",
-    color: "#111",
+    fontSize: fontSize.md,
+    fontWeight: fontWeight.semibold,
+    color: colors.textPrimary,
     flex: 1,
-    marginRight: GRID,
+    marginRight: spacing.xs,
   },
   pickerDropdown: {
-    backgroundColor: "#FFF",
-    borderRadius: GRID,
+    backgroundColor: colors.surface,
+    borderRadius: radius.md,
     borderWidth: 1,
-    borderColor: "#E6E8EC",
-    marginBottom: GRID * 2,
+    borderColor: colors.border,
+    marginBottom: spacing.md,
     overflow: "hidden",
   },
   pickerRow: {
-    paddingVertical: GRID * 1.5,
-    paddingHorizontal: GRID * 2,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.md,
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: "#E6E8EC",
+    borderBottomColor: colors.border,
   },
   pickerRowText: {
-    fontSize: 15,
-    color: "#333",
+    fontSize: fontSize.md,
+    color: colors.textSecondary,
   },
   monthRow: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginBottom: GRID * 2,
-    paddingVertical: GRID,
+    marginBottom: spacing.md,
+    paddingVertical: spacing.xs,
   },
   toggleWrap: {
     flexDirection: "row",
-    backgroundColor: "#E6E8EC",
-    borderRadius: GRID,
-    padding: GRID / 2,
+    backgroundColor: colors.border,
+    borderRadius: radius.md,
+    padding: spacing.xxs,
   },
   toggleOption: {
-    paddingVertical: GRID,
-    paddingHorizontal: GRID * 2,
-    borderRadius: GRID / 2,
-    minWidth: GRID * 8,
+    paddingVertical: spacing.xs,
+    paddingHorizontal: spacing.md,
+    borderRadius: radius.sm,
+    minWidth: spacing.huge,
     alignItems: "center",
   },
   toggleOptionActive: {
-    backgroundColor: "#FFF",
-    shadowColor: "#000",
+    backgroundColor: colors.surface,
+    shadowColor: colors.shadow,
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.06,
     shadowRadius: 2,
     elevation: 2,
   },
   toggleText: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: "#666",
+    fontSize: fontSize.base,
+    fontWeight: fontWeight.semibold,
+    color: colors.textMuted,
   },
   toggleTextActive: {
-    color: "#111",
+    color: colors.textPrimary,
   },
   monthNav: {
     flexDirection: "row",
     alignItems: "center",
   },
   monthArrow: {
-    padding: GRID,
+    padding: spacing.xs,
   },
   monthLabel: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#111",
-    minWidth: GRID * 14,
+    fontSize: fontSize.lg,
+    fontWeight: fontWeight.semibold,
+    color: colors.textPrimary,
+    minWidth: 112,
     textAlign: "center",
   },
   controlsCard: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#FFF",
-    borderRadius: GRID,
+    backgroundColor: colors.surface,
+    borderRadius: radius.md,
     borderWidth: 1,
-    borderColor: "#E6E8EC",
-    padding: GRID * 2,
-    marginBottom: GRID * 2,
+    borderColor: colors.border,
+    padding: spacing.md,
+    marginBottom: spacing.md,
   },
   sortTouchable: {
     flexDirection: "row",
     alignItems: "center",
-    marginRight: GRID * 2,
-    paddingRight: GRID * 2,
+    marginRight: spacing.md,
+    paddingRight: spacing.md,
     borderRightWidth: StyleSheet.hairlineWidth,
-    borderRightColor: "#E6E8EC",
-    minWidth: GRID * 10,
+    borderRightColor: colors.border,
+    minWidth: 80,
   },
   sortLabel: {
-    fontSize: 14,
-    color: "#333",
-    marginRight: GRID / 2,
+    fontSize: fontSize.base,
+    color: colors.textSecondary,
+    marginRight: spacing.xxs,
   },
   searchWrap: {
     flex: 1,
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#F6F7F9",
-    borderRadius: GRID,
-    paddingLeft: GRID * 2,
-    paddingRight: GRID,
-    height: GRID * 5,
+    backgroundColor: colors.screenBackground,
+    borderRadius: radius.md,
+    paddingLeft: spacing.md,
+    paddingRight: spacing.xs,
+    height: spacing.xxl,
   },
   searchInput: {
     flex: 1,
-    fontSize: 14,
-    color: "#111",
+    fontSize: fontSize.base,
+    color: colors.textPrimary,
     paddingVertical: 0,
   },
   searchIcon: {
-    marginLeft: GRID / 2,
+    marginLeft: spacing.xxs,
   },
   errorCard: {
-    backgroundColor: "#FFF",
-    padding: GRID * 2,
-    borderRadius: GRID,
+    backgroundColor: colors.surface,
+    padding: spacing.md,
+    borderRadius: radius.md,
     borderWidth: 1,
-    borderColor: "#E6E8EC",
-    marginBottom: GRID * 2,
+    borderColor: colors.border,
+    marginBottom: spacing.md,
   },
   errorText: {
-    fontSize: 15,
-    color: "#D32F2F",
-    marginBottom: GRID,
+    fontSize: fontSize.md,
+    color: colors.danger,
+    marginBottom: spacing.xs,
   },
   retryButton: {
     alignSelf: "flex-start",
-    paddingVertical: GRID,
-    paddingHorizontal: GRID * 2,
+    paddingVertical: spacing.xs,
+    paddingHorizontal: spacing.md,
   },
   retryButtonText: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: "#0c4a6e",
+    fontSize: fontSize.base,
+    fontWeight: fontWeight.semibold,
+    color: colors.link,
   },
   emptyCard: {
-    backgroundColor: "#FFF",
-    padding: GRID * 3,
-    borderRadius: GRID,
+    backgroundColor: colors.surface,
+    padding: spacing.lg,
+    borderRadius: radius.md,
     borderWidth: 1,
-    borderColor: "#E6E8EC",
+    borderColor: colors.border,
   },
   emptyText: {
-    fontSize: 15,
-    color: "#666",
+    fontSize: fontSize.md,
+    color: colors.textMuted,
     textAlign: "center",
-    marginBottom: GRID,
+    marginBottom: spacing.xs,
   },
   emptyHint: {
     fontSize: 13,
-    color: "#999",
+    color: colors.textPlaceholder,
     textAlign: "center",
   },
   linkButton: {
-    marginTop: GRID * 2,
-    paddingVertical: GRID * 2,
+    marginTop: spacing.md,
+    paddingVertical: spacing.md,
     alignItems: "center",
   },
   linkButtonText: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#2ECC71",
+    fontSize: fontSize.lg,
+    fontWeight: fontWeight.semibold,
+    color: colors.primary,
   },
   section: {
-    marginBottom: GRID * 3,
+    marginBottom: spacing.lg,
   },
   sectionMonth: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: "#111",
-    marginBottom: GRID,
+    fontSize: fontSize.xl,
+    fontWeight: fontWeight.bold,
+    color: colors.textPrimary,
+    marginBottom: spacing.xs,
   },
   dashedLine: {
     borderStyle: "dashed",
     borderBottomWidth: 1,
-    borderBottomColor: "#CCC",
-    marginBottom: GRID,
+    borderBottomColor: colors.borderStrong,
+    marginBottom: spacing.xs,
   },
   row: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#FFF",
-    paddingVertical: GRID * 1.5,
-    paddingHorizontal: GRID * 2,
+    backgroundColor: colors.surface,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.md,
     marginBottom: 1,
     borderLeftWidth: 4,
-    borderLeftColor: "transparent",
+    borderLeftColor: colors.transparent,
   },
   rowIcon: {
     width: 40,
@@ -724,22 +729,22 @@ const styles = StyleSheet.create({
   },
   rowBody: {
     flex: 1,
-    marginLeft: GRID,
+    marginLeft: spacing.xs,
     minWidth: 0,
   },
   rowName: {
-    fontSize: 15,
-    fontWeight: "600",
-    color: "#111",
+    fontSize: fontSize.md,
+    fontWeight: fontWeight.semibold,
+    color: colors.textPrimary,
   },
   rowCategory: {
-    fontSize: 12,
-    color: "#666",
+    fontSize: fontSize.sm,
+    color: colors.textMuted,
     marginTop: 2,
   },
   rowDate: {
-    fontSize: 12,
-    color: "#888",
+    fontSize: fontSize.sm,
+    color: colors.textPlaceholder,
     marginTop: 2,
   },
   rowRight: {
@@ -747,47 +752,47 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   rowAmount: {
-    fontSize: 15,
-    fontWeight: "600",
-    color: "#111",
+    fontSize: fontSize.md,
+    fontWeight: fontWeight.semibold,
+    color: colors.textPrimary,
     marginRight: 4,
   },
   detailCloseRow: {
-    marginBottom: GRID * 2,
+    marginBottom: spacing.md,
   },
   detailCloseText: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#2ECC71",
+    fontSize: fontSize.lg,
+    fontWeight: fontWeight.semibold,
+    color: colors.textPrimary,
   },
   detailCard: {
-    backgroundColor: "#F6F7F9",
-    borderRadius: GRID,
-    padding: GRID * 2,
-    marginBottom: GRID * 2,
+    backgroundColor: colors.screenBackground,
+    borderRadius: radius.md,
+    padding: spacing.md,
+    marginBottom: spacing.md,
     borderWidth: 1,
-    borderColor: "#E6E8EC",
+    borderColor: colors.border,
   },
   detailLabel: {
-    fontSize: 12,
-    fontWeight: "600",
-    color: "#888",
+    fontSize: fontSize.sm,
+    fontWeight: fontWeight.semibold,
+    color: colors.textPrimary,
     textTransform: "uppercase",
     letterSpacing: 0.5,
     marginBottom: 4,
   },
   detailValue: {
-    fontSize: 16,
-    color: "#111",
-    fontWeight: "500",
+    fontSize: fontSize.lg,
+    color: colors.textPrimary,
+    fontWeight: fontWeight.medium,
   },
   detailAmount: {
-    fontSize: 20,
-    fontWeight: "700",
+    fontSize: fontSize.xxl,
+    fontWeight: fontWeight.bold,
   },
   detailPendingBadge: {
-    fontSize: 14,
-    color: "#b45309",
-    fontWeight: "600",
+    fontSize: fontSize.base,
+    color: colors.textPrimary,
+    fontWeight: fontWeight.semibold,
   },
 });

@@ -8,6 +8,7 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import TextCustom from '@/components/TextCustom';
 import { useAuth } from '@/context/AuthContext';
 import { account } from '@/lib/appwriteConfig';
+import { colors, fontSize, fontWeight, radius, spacing } from '@/theme';
 
 type CreateAccountFormProps = {
   /** Called when user taps X or "Log in" to close the sheet. */
@@ -67,7 +68,7 @@ export default function CreateAccountForm({ onClose, prefilledEmail = '' }: Crea
           style={styles.headerButton}
           accessibilityLabel="Close"
           accessibilityRole="button">
-          <Ionicons name="close" size={24} color="#333" />
+          <Ionicons name="close" size={24} color={colors.textSecondary} />
         </TouchableOpacity>
         <TextCustom style={styles.sheetTitle} fontSize={20}>
           Create an account
@@ -82,6 +83,7 @@ export default function CreateAccountForm({ onClose, prefilledEmail = '' }: Crea
       <TextCustom>Email</TextCustom>
       <BottomSheetTextInput
         placeholder="you@example.com"
+        placeholderTextColor={colors.textPlaceholder}
         style={styles.input}
         value={email}
         onChangeText={setEmail}
@@ -95,6 +97,7 @@ export default function CreateAccountForm({ onClose, prefilledEmail = '' }: Crea
       <View style={styles.passwordRow}>
         <BottomSheetTextInput
           placeholder="At least 8 characters"
+          placeholderTextColor={colors.textPlaceholder}
           style={styles.passwordInput}
           value={password}
           onChangeText={setPassword}
@@ -109,7 +112,7 @@ export default function CreateAccountForm({ onClose, prefilledEmail = '' }: Crea
           <Ionicons
             name={showPassword ? 'eye-outline' : 'eye-off-outline'}
             size={22}
-            color="#666"
+            color={colors.textMuted}
           />
         </TouchableOpacity>
       </View>
@@ -134,79 +137,83 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 24,
+    marginBottom: spacing.lg,
   },
   headerButton: {
-    padding: 8,
+    padding: spacing.xs,
   },
   sheetTitle: {
-    fontWeight: '700',
+    fontWeight: fontWeight.bold,
     fontStyle: 'italic',
   },
   logInButton: {
-    backgroundColor: '#E5E5EA',
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 8,
+    backgroundColor: colors.surfaceMuted,
+    paddingVertical: spacing.xs,
+    paddingHorizontal: spacing.md,
+    borderRadius: radius.md,
   },
   logInButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
+    fontSize: fontSize.lg,
+    fontWeight: fontWeight.semibold,
+    color: colors.textSecondary,
   },
   input: {
     borderWidth: 1,
-    borderRadius: 8,
-    padding: 16,
-    marginTop: 8,
-    marginBottom: 8,
-    borderColor: 'grey',
+    borderRadius: radius.md,
+    padding: spacing.md,
+    marginTop: spacing.xs,
+    marginBottom: spacing.xs,
+    borderColor: colors.border,
+    backgroundColor: colors.surface,
+    color: colors.textPrimary,
   },
   passwordRow: {
     flexDirection: 'row',
     alignItems: 'center',
     borderWidth: 1,
-    borderRadius: 8,
-    borderColor: 'grey',
-    marginTop: 8,
-    marginBottom: 8,
+    borderRadius: radius.md,
+    borderColor: colors.border,
+    backgroundColor: colors.surface,
+    marginTop: spacing.xs,
+    marginBottom: spacing.xs,
   },
   passwordInput: {
     flex: 1,
-    paddingVertical: 16,
-    paddingLeft: 16,
-    paddingRight: 8,
+    paddingVertical: spacing.md,
+    paddingLeft: spacing.md,
+    paddingRight: spacing.xs,
+    color: colors.textPrimary,
   },
   eyeButton: {
-    padding: 8,
+    padding: spacing.xs,
   },
   button: {
-    backgroundColor: 'black',
-    padding: 16,
-    borderRadius: 8,
+    backgroundColor: colors.primary,
+    padding: spacing.md,
+    borderRadius: radius.md,
     alignItems: 'center',
-    marginTop: 16,
+    marginTop: spacing.md,
   },
   buttonDisabled: {
     opacity: 0.6,
   },
   buttonText: {
-    color: 'white',
-    fontSize: 18,
-    fontWeight: '600',
+    color: colors.textOnPrimary,
+    fontSize: fontSize.xl,
+    fontWeight: fontWeight.semibold,
   },
   errorText: {
-    color: '#b00020',
-    marginBottom: 16,
+    color: colors.danger,
+    marginBottom: spacing.md,
   },
   legalText: {
-    marginTop: 16,
-    fontSize: 14,
-    color: '#666',
+    marginTop: spacing.md,
+    fontSize: fontSize.base,
+    color: colors.textMuted,
     textAlign: 'center',
   },
   legalLink: {
     textDecorationLine: 'underline',
-    color: '#666',
+    color: colors.link,
   },
 });

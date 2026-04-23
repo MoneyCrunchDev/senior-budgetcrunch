@@ -37,9 +37,10 @@ import {
   open,
 } from "react-native-plaid-link-sdk";
 
-const GRID = 8;
-const ACCENT_GREEN = "#2ECC71";
-const ACCENT_GREEN_DARK = "#27AE60";
+import { colors, fontSize, fontWeight, radius, spacing } from "@/theme";
+
+const ACCENT_GREEN = colors.primary;
+const ACCENT_GREEN_DARK = colors.primaryDark;
 
 type LinkSuccessState = { institutionName: string };
 
@@ -144,7 +145,7 @@ export default function BankConnectScreen() {
   if (authLoading) {
     return (
       <View style={[styles.root, styles.centered]}>
-        <ActivityIndicator size="large" color="#111" />
+        <ActivityIndicator size="large" color={colors.primary} />
       </View>
     );
   }
@@ -152,7 +153,7 @@ export default function BankConnectScreen() {
   return (
     <View style={styles.root}>
       <View
-        style={[styles.topBar, { paddingTop: Math.max(insets.top, GRID * 2) }]}
+        style={[styles.topBar, { paddingTop: Math.max(insets.top, spacing.md) }]}
       >
         <Pressable
           onPress={handleBack}
@@ -163,7 +164,7 @@ export default function BankConnectScreen() {
           accessibilityRole="button"
           accessibilityLabel={linkSuccess ? "Done, go back" : "Go back"}
         >
-          <Ionicons name="chevron-back" size={22} color="#111" />
+          <Ionicons name="chevron-back" size={22} color={colors.textPrimary} />
           <Text style={styles.backText}>Back</Text>
         </Pressable>
       </View>
@@ -171,7 +172,7 @@ export default function BankConnectScreen() {
       <ScrollView
         contentContainerStyle={[
           styles.scrollContent,
-          { paddingBottom: Math.max(insets.bottom, GRID * 2) + GRID * 2 },
+          { paddingBottom: Math.max(insets.bottom, spacing.md) + spacing.md },
         ]}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
@@ -180,7 +181,7 @@ export default function BankConnectScreen() {
           <View style={styles.card}>
             <View style={styles.successBadge}>
               <View style={styles.successIconRing}>
-                <Ionicons name="checkmark" size={36} color="#FFF" />
+                <Ionicons name="checkmark" size={36} color={colors.textOnPrimary} />
               </View>
             </View>
             <Text style={styles.successKicker}>Bank linked</Text>
@@ -199,7 +200,7 @@ export default function BankConnectScreen() {
           <View style={styles.card}>
             <View style={styles.iconWrap}>
               <View style={styles.iconCircle}>
-                <Ionicons name="shield-checkmark" size={32} color="#1B5E20" />
+                <Ionicons name="shield-checkmark" size={32} color={colors.successStrong} />
               </View>
             </View>
 
@@ -221,7 +222,7 @@ export default function BankConnectScreen() {
               disabled={!userId || busy}
             >
               {busy ? (
-                <ActivityIndicator color="#fff" />
+                <ActivityIndicator color={colors.textOnPrimary} />
               ) : (
                 <Text style={styles.buttonText}>Connect bank</Text>
               )}
@@ -236,7 +237,7 @@ export default function BankConnectScreen() {
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    backgroundColor: "#F6F7F9",
+    backgroundColor: colors.screenBackground,
   },
 
   centered: {
@@ -245,17 +246,17 @@ const styles = StyleSheet.create({
   },
 
   topBar: {
-    paddingHorizontal: GRID * 2,
-    paddingBottom: GRID,
+    paddingHorizontal: spacing.md,
+    paddingBottom: spacing.xs,
   },
 
   backRow: {
     flexDirection: "row",
     alignItems: "center",
     alignSelf: "flex-start",
-    paddingVertical: GRID,
-    paddingRight: GRID * 2,
-    gap: GRID / 2,
+    paddingVertical: spacing.xs,
+    paddingRight: spacing.md,
+    gap: spacing.xxs,
   },
 
   backRowPressed: {
@@ -264,67 +265,67 @@ const styles = StyleSheet.create({
 
   backText: {
     fontSize: 17,
-    fontWeight: "600",
-    color: "#111",
+    fontWeight: fontWeight.semibold,
+    color: colors.textPrimary,
   },
 
   scrollContent: {
     flexGrow: 1,
     justifyContent: "center",
-    paddingHorizontal: GRID * 2,
-    paddingTop: GRID * 2,
+    paddingHorizontal: spacing.md,
+    paddingTop: spacing.md,
   },
 
   card: {
-    backgroundColor: "#FFFFFF",
-    borderRadius: GRID * 1.5,
+    backgroundColor: colors.surface,
+    borderRadius: radius.lg,
     borderWidth: 1,
-    borderColor: "#E6E8EC",
-    padding: GRID * 3,
+    borderColor: colors.border,
+    padding: spacing.lg,
   },
 
   iconWrap: {
     alignItems: "center",
-    marginBottom: GRID * 2,
+    marginBottom: spacing.md,
   },
 
   iconCircle: {
-    width: GRID * 9,
-    height: GRID * 9,
-    borderRadius: GRID * 4.5,
-    backgroundColor: "#E8F5E9",
+    width: 72,
+    height: 72,
+    borderRadius: 36,
+    backgroundColor: colors.primarySoft,
     alignItems: "center",
     justifyContent: "center",
   },
 
   title: {
-    fontSize: 24,
-    fontWeight: "700",
-    color: "#111",
-    marginBottom: GRID * 1.5,
+    fontSize: fontSize.display,
+    fontWeight: fontWeight.bold,
+    color: colors.textPrimary,
+    marginBottom: spacing.sm,
     textAlign: "center",
   },
 
   body: {
-    fontSize: 16,
+    fontSize: fontSize.lg,
     lineHeight: 24,
-    color: "#4B5563",
-    marginBottom: GRID * 2,
+    color: colors.textSecondary,
+    marginBottom: spacing.md,
     textAlign: "center",
   },
 
   warn: {
-    color: "#b45309",
-    fontSize: 14,
-    fontWeight: "600",
-    marginBottom: GRID * 2,
+    color: colors.warningStrong,
+    fontSize: fontSize.base,
+    fontWeight: fontWeight.semibold,
+    marginBottom: spacing.md,
     textAlign: "center",
   },
 
   button: {
-    height: GRID * 7,
-    borderRadius: GRID,
-    backgroundColor: "#111",
+    height: 56,
+    borderRadius: radius.md,
+    backgroundColor: colors.primary,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -334,20 +335,20 @@ const styles = StyleSheet.create({
   },
 
   buttonText: {
-    color: "#fff",
+    color: colors.textOnPrimary,
     fontSize: 17,
-    fontWeight: "700",
+    fontWeight: fontWeight.bold,
   },
 
   successBadge: {
     alignItems: "center",
-    marginBottom: GRID * 2,
+    marginBottom: spacing.md,
   },
 
   successIconRing: {
-    width: GRID * 11,
-    height: GRID * 11,
-    borderRadius: GRID * 5.5,
+    width: 88,
+    height: 88,
+    borderRadius: 44,
     backgroundColor: ACCENT_GREEN,
     alignItems: "center",
     justifyContent: "center",
@@ -360,66 +361,66 @@ const styles = StyleSheet.create({
 
   successKicker: {
     fontSize: 13,
-    fontWeight: "700",
+    fontWeight: fontWeight.bold,
     color: ACCENT_GREEN_DARK,
     textAlign: "center",
     letterSpacing: 1.2,
     textTransform: "uppercase",
-    marginBottom: GRID / 2,
+    marginBottom: spacing.xxs,
   },
 
   successBankName: {
     fontSize: 26,
-    fontWeight: "800",
-    color: "#111",
+    fontWeight: fontWeight.extrabold,
+    color: colors.textPrimary,
     textAlign: "center",
-    marginBottom: GRID * 1.5,
-    marginTop: GRID / 2,
+    marginBottom: spacing.sm,
+    marginTop: spacing.xxs,
     letterSpacing: -0.3,
   },
 
   successSubhead: {
     fontSize: 17,
     lineHeight: 24,
-    fontWeight: "600",
-    color: "#374151",
+    fontWeight: fontWeight.semibold,
+    color: colors.textSecondary,
     textAlign: "center",
-    marginBottom: GRID * 1.5,
+    marginBottom: spacing.sm,
   },
 
   successBody: {
-    fontSize: 15,
+    fontSize: fontSize.md,
     lineHeight: 22,
-    color: "#6B7280",
+    color: colors.textMuted,
     textAlign: "center",
-    marginBottom: GRID * 2,
+    marginBottom: spacing.md,
   },
 
   successCheckRow: {
     flexDirection: "row",
     alignItems: "flex-start",
-    gap: GRID,
-    backgroundColor: "#E8F8EF",
-    borderRadius: GRID,
-    padding: GRID * 1.5,
+    gap: spacing.xs,
+    backgroundColor: colors.primarySoft,
+    borderRadius: radius.md,
+    padding: spacing.sm,
     marginBottom: 0,
     borderWidth: 1,
-    borderColor: "#C8EDD8",
+    borderColor: colors.primarySoftBorder,
   },
 
   successCheckText: {
     flex: 1,
-    fontSize: 14,
+    fontSize: fontSize.base,
     lineHeight: 20,
-    color: "#1B4332",
-    fontWeight: "500",
+    color: colors.primaryDark,
+    fontWeight: fontWeight.medium,
   },
 
   hint: {
-    marginTop: GRID * 2,
-    fontSize: 12,
+    marginTop: spacing.md,
+    fontSize: fontSize.sm,
     lineHeight: 18,
-    color: "#6B7280",
+    color: colors.textMuted,
     textAlign: "center",
   },
 });

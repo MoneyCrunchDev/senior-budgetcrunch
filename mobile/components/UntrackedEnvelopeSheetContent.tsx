@@ -18,16 +18,18 @@ import {
   totalSpent,
   type MerchantGroup,
 } from "@/lib/merchantTransactionGroups";
+import { colors, fontSize, fontWeight, radius, spacing } from "@/theme";
 
 type Props = {
   transactions: Transaction[];
   onClose: () => void;
 };
 
-const ACCENT = "#0A6EF2";
-const CARD_BG = "#F4F6FA";
-const INK = "#111827";
-const MUTED = "#6B7280";
+/** Local aliases to keep the JSX terse — all values live in the theme. */
+const ACCENT = colors.link;
+const CARD_BG = colors.surfaceSubtle;
+const INK = colors.textPrimary;
+const MUTED = colors.textMuted;
 
 export default function UntrackedEnvelopeSheetContent({
   transactions,
@@ -104,7 +106,7 @@ export default function UntrackedEnvelopeSheetContent({
           )}
           {largest && (
             <View style={styles.insightCallout}>
-              <Ionicons name="trending-up" size={18} color="#B45309" />
+              <Ionicons name="trending-up" size={18} color={colors.warningStrong} />
               <View style={styles.insightCalloutBody}>
                 <Text style={styles.insightCalloutLabel}>Largest charge</Text>
                 <Text style={styles.insightCalloutValue} numberOfLines={1}>
@@ -264,103 +266,103 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   sheetEyebrow: {
-    fontSize: 12,
-    fontWeight: "600",
+    fontSize: fontSize.sm,
+    fontWeight: fontWeight.semibold,
     color: MUTED,
     letterSpacing: 0.3,
     textTransform: "uppercase",
   },
   closeBtn: {
-    paddingVertical: 4,
-    paddingLeft: 8,
+    paddingVertical: spacing.xxs,
+    paddingLeft: spacing.xs,
   },
   closeText: {
-    fontSize: 16,
+    fontSize: fontSize.lg,
     color: ACCENT,
-    fontWeight: "600",
+    fontWeight: fontWeight.semibold,
   },
   emptyHero: {
     backgroundColor: CARD_BG,
-    borderRadius: 16,
-    padding: 16,
-    marginTop: 4,
+    borderRadius: radius.xl,
+    padding: spacing.md,
+    marginTop: spacing.xxs,
   },
   heroIconWrap: {
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: "#fff",
+    backgroundColor: colors.surface,
     alignItems: "center",
     justifyContent: "center",
     alignSelf: "flex-start",
-    marginBottom: 12,
+    marginBottom: spacing.sm,
   },
   hero: {
     backgroundColor: CARD_BG,
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 20,
+    borderRadius: radius.xl,
+    padding: spacing.md,
+    marginBottom: spacing.lg,
   },
   heroTitle: {
-    fontSize: 20,
-    fontWeight: "700",
+    fontSize: fontSize.xxl,
+    fontWeight: fontWeight.bold,
     color: INK,
-    marginBottom: 8,
+    marginBottom: spacing.xs,
     lineHeight: 26,
   },
   heroSubtitle: {
-    fontSize: 14,
+    fontSize: fontSize.base,
     color: MUTED,
     lineHeight: 20,
     marginBottom: 14,
   },
   heroTotal: {
     fontSize: 32,
-    fontWeight: "800",
-    color: "#DC2626",
+    fontWeight: fontWeight.extrabold,
+    color: colors.danger,
     letterSpacing: -0.5,
     marginBottom: 14,
   },
   heroTotalSuffix: {
-    fontSize: 16,
-    fontWeight: "600",
+    fontSize: fontSize.lg,
+    fontWeight: fontWeight.semibold,
     color: MUTED,
     letterSpacing: 0,
   },
   statRow: {
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: 8,
-    marginBottom: 12,
+    gap: spacing.xs,
+    marginBottom: spacing.sm,
   },
   statPill: {
-    backgroundColor: "#fff",
-    borderRadius: 12,
+    backgroundColor: colors.surface,
+    borderRadius: radius.lg,
     paddingVertical: 10,
-    paddingHorizontal: 12,
+    paddingHorizontal: spacing.sm,
     minWidth: "30%",
     flexGrow: 1,
   },
   statPillValue: {
     fontSize: 17,
-    fontWeight: "800",
+    fontWeight: fontWeight.extrabold,
     color: INK,
   },
   statPillLabel: {
-    fontSize: 11,
+    fontSize: fontSize.xs,
     color: MUTED,
     marginTop: 2,
-    fontWeight: "500",
+    fontWeight: fontWeight.medium,
   },
   heroMeta: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 8,
+    gap: spacing.xs,
   },
   heroMetaText: {
-    fontSize: 14,
+    fontSize: fontSize.base,
     color: MUTED,
-    fontWeight: "500",
+    fontWeight: fontWeight.medium,
     flex: 1,
   },
   insightCallout: {
@@ -370,65 +372,65 @@ const styles = StyleSheet.create({
     marginTop: 14,
     paddingTop: 14,
     borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: "#D1D5DB",
+    borderTopColor: colors.borderStrong,
   },
   insightCalloutBody: {
     flex: 1,
   },
   insightCalloutLabel: {
-    fontSize: 11,
-    fontWeight: "700",
+    fontSize: fontSize.xs,
+    fontWeight: fontWeight.bold,
     color: MUTED,
     textTransform: "uppercase",
     letterSpacing: 0.4,
     marginBottom: 2,
   },
   insightCalloutValue: {
-    fontSize: 14,
-    fontWeight: "600",
+    fontSize: fontSize.base,
+    fontWeight: fontWeight.semibold,
     color: INK,
   },
   breakdown: {
-    marginBottom: 20,
+    marginBottom: spacing.lg,
   },
   sectionTitle: {
     fontSize: 13,
-    fontWeight: "700",
+    fontWeight: fontWeight.bold,
     color: MUTED,
     textTransform: "uppercase",
     letterSpacing: 0.5,
-    marginBottom: 12,
+    marginBottom: spacing.sm,
   },
   breakdownRow: {
-    marginBottom: 12,
+    marginBottom: spacing.sm,
   },
   breakdownHead: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "baseline",
     marginBottom: 6,
-    gap: 8,
+    gap: spacing.xs,
   },
   breakdownLabel: {
     flex: 1,
-    fontSize: 14,
-    fontWeight: "600",
+    fontSize: fontSize.base,
+    fontWeight: fontWeight.semibold,
     color: INK,
   },
   breakdownAmt: {
-    fontSize: 14,
-    fontWeight: "700",
+    fontSize: fontSize.base,
+    fontWeight: fontWeight.bold,
     color: INK,
   },
   breakdownPct: {
-    fontWeight: "500",
+    fontWeight: fontWeight.medium,
     color: MUTED,
     fontSize: 13,
   },
   barTrack: {
     height: 6,
     borderRadius: 3,
-    backgroundColor: "#E5E7EB",
+    backgroundColor: colors.divider,
     overflow: "hidden",
   },
   barFill: {
@@ -438,7 +440,7 @@ const styles = StyleSheet.create({
   },
   listSectionTitle: {
     fontSize: 13,
-    fontWeight: "700",
+    fontWeight: fontWeight.bold,
     color: MUTED,
     textTransform: "uppercase",
     letterSpacing: 0.5,
@@ -448,23 +450,23 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   listContent: {
-    paddingBottom: 32,
+    paddingBottom: spacing.xl,
   },
   emptyText: {
-    fontSize: 15,
+    fontSize: fontSize.md,
     color: MUTED,
     textAlign: "center",
-    marginTop: 16,
+    marginTop: spacing.md,
     lineHeight: 22,
   },
   merchantCard: {
-    backgroundColor: "#fff",
+    backgroundColor: colors.surface,
     borderRadius: 14,
-    marginBottom: 12,
+    marginBottom: spacing.sm,
     borderWidth: 1,
-    borderColor: "#E5E7EB",
+    borderColor: colors.divider,
     overflow: "hidden",
-    shadowColor: "#000",
+    shadowColor: colors.shadow,
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.04,
     shadowRadius: 3,
@@ -473,42 +475,42 @@ const styles = StyleSheet.create({
   merchantHeader: {
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 12,
-    paddingTop: 12,
+    paddingHorizontal: spacing.sm,
+    paddingTop: spacing.sm,
     paddingBottom: 10,
-    backgroundColor: "#FAFBFC",
+    backgroundColor: colors.surfaceAlt,
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: "#E5E7EB",
+    borderBottomColor: colors.divider,
   },
   merchantHeaderBody: {
     flex: 1,
     minWidth: 0,
   },
   merchantName: {
-    fontSize: 16,
-    fontWeight: "700",
+    fontSize: fontSize.lg,
+    fontWeight: fontWeight.bold,
     color: INK,
   },
   merchantMeta: {
     fontSize: 13,
     color: MUTED,
-    marginTop: 4,
-    fontWeight: "500",
+    marginTop: spacing.xxs,
+    fontWeight: fontWeight.medium,
   },
   txLines: {
-    paddingHorizontal: 12,
-    paddingBottom: 4,
+    paddingHorizontal: spacing.sm,
+    paddingBottom: spacing.xxs,
   },
   txLine: {
     flexDirection: "row",
     alignItems: "flex-start",
     justifyContent: "space-between",
     paddingVertical: 10,
-    gap: 12,
+    gap: spacing.sm,
   },
   txLineBorder: {
     borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: "#EEF0F3",
+    borderTopColor: colors.divider,
   },
   txLineLeft: {
     flex: 1,
@@ -518,21 +520,21 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     flexWrap: "wrap",
-    gap: 8,
+    gap: spacing.xs,
   },
   txLineDate: {
-    fontSize: 15,
-    fontWeight: "600",
+    fontSize: fontSize.md,
+    fontWeight: fontWeight.semibold,
     color: INK,
   },
   txLineCat: {
-    fontSize: 12,
+    fontSize: fontSize.sm,
     color: MUTED,
-    marginTop: 4,
+    marginTop: spacing.xxs,
   },
   txLineAmount: {
-    fontSize: 15,
-    fontWeight: "700",
+    fontSize: fontSize.md,
+    fontWeight: fontWeight.bold,
     color: INK,
     paddingTop: 1,
   },
@@ -542,23 +544,23 @@ const styles = StyleSheet.create({
     borderRadius: 22,
     alignItems: "center",
     justifyContent: "center",
-    marginRight: 12,
+    marginRight: spacing.sm,
   },
   avatarText: {
-    color: "#fff",
-    fontSize: 15,
-    fontWeight: "800",
+    color: colors.textOnPrimary,
+    fontSize: fontSize.md,
+    fontWeight: fontWeight.extrabold,
   },
   pendingBadgeInline: {
-    backgroundColor: "#FEF3C7",
-    paddingHorizontal: 8,
+    backgroundColor: colors.warningSoft,
+    paddingHorizontal: spacing.xs,
     paddingVertical: 2,
-    borderRadius: 6,
+    borderRadius: radius.sm,
     alignSelf: "flex-start",
   },
   pendingText: {
     fontSize: 10,
-    fontWeight: "700",
-    color: "#B45309",
+    fontWeight: fontWeight.bold,
+    color: colors.warningStrong,
   },
 });

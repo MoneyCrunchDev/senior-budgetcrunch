@@ -30,8 +30,7 @@ import ModalBottomSheet from "@/components/ModalBottomSheet";
 import { useTransactions } from "@/context/TransactionContext";
 import { useActivityCategories } from "@/context/ActivityCategoriesContext";
 import { getPrimarySlug } from "@/lib/categoryHelpers";
-
-const GRID = 8;
+import { colors, fontSize, fontWeight, radius, spacing } from "@/theme";
 
 function toDateKey(d: Date): string {
   const y = d.getFullYear();
@@ -186,26 +185,26 @@ export default function CalendarScreen() {
         marks[dateStr] = {
           customStyles: {
             container: {
-              backgroundColor: "#E8F5E9",
-              borderRadius: 8,
+              backgroundColor: colors.successSoft,
+              borderRadius: radius.md,
             },
-            text: { color: "#333", fontWeight: "500" as const },
+            text: { color: colors.textSecondary, fontWeight: fontWeight.medium },
           },
         };
       } else if (status === "red") {
         marks[dateStr] = {
           customStyles: {
             container: {
-              backgroundColor: "#FFEBEE",
-              borderRadius: 8,
+              backgroundColor: colors.dangerSoft,
+              borderRadius: radius.md,
             },
-            text: { color: "#333", fontWeight: "500" as const },
+            text: { color: colors.textSecondary, fontWeight: fontWeight.medium },
           },
         };
       }
     }
 
-    // Today highlight: blue text + light blue tint
+    // Today highlight: info text + soft info tint
     marks[todayStr] = {
       ...marks[todayStr],
       customStyles: {
@@ -214,19 +213,18 @@ export default function CalendarScreen() {
           ...marks[todayStr]?.customStyles?.container,
           backgroundColor:
             marks[todayStr]?.customStyles?.container?.backgroundColor ??
-            "#E3F2FD",
-          borderRadius: 8,
+            colors.infoSoft,
+          borderRadius: radius.md,
         },
         text: {
           ...marks[todayStr]?.customStyles?.text,
-          color: "#037AFF",
-          fontWeight: "700" as const,
+          color: colors.info,
+          fontWeight: fontWeight.bold,
         },
       },
     };
 
-    // Selected day: keep the existing day tint but add a bottom accent bar
-    // so the user can still see green/red status while knowing what's selected
+    // Selected day: keep tint, add an accent bar at the bottom
     if (selectedDate) {
       const existing = marks[selectedDate]?.customStyles?.container ?? {};
       const existingText = marks[selectedDate]?.customStyles?.text ?? {};
@@ -234,15 +232,15 @@ export default function CalendarScreen() {
         customStyles: {
           container: {
             ...existing,
-            backgroundColor: existing.backgroundColor ?? "#E8EDF2",
-            borderRadius: 8,
+            backgroundColor: existing.backgroundColor ?? colors.divider,
+            borderRadius: radius.md,
             borderBottomWidth: 3,
-            borderBottomColor: "#111",
+            borderBottomColor: colors.primary,
           },
           text: {
             ...existingText,
-            color: existingText.color === "#037AFF" ? "#037AFF" : "#111",
-            fontWeight: "700" as const,
+            color: existingText.color === colors.info ? colors.info : colors.textPrimary,
+            fontWeight: fontWeight.bold,
           },
         },
       };
@@ -470,8 +468,8 @@ export default function CalendarScreen() {
           <RefreshControl
             refreshing={listRefreshing}
             onRefresh={onListRefresh}
-            tintColor="#007AFF"
-            colors={["#007AFF"]}
+            tintColor={colors.primary}
+            colors={[colors.primary]}
           />
         }
       >
@@ -482,11 +480,18 @@ export default function CalendarScreen() {
           onDayPress={handleDayPress}
           onMonthChange={handleMonthChange}
           theme={{
-            backgroundColor: "#F6F7F9",
-            calendarBackground: "#F6F7F9",
-            todayTextColor: "#007AFF",
-            arrowColor: "#007AFF",
-            textDayFontWeight: "500",
+            backgroundColor: colors.screenBackground,
+            calendarBackground: colors.screenBackground,
+            monthTextColor: colors.textPrimary,
+            textMonthFontWeight: fontWeight.bold,
+            textSectionTitleColor: colors.textSecondary,
+            textSectionTitleDisabledColor: colors.textPlaceholder,
+            dayTextColor: colors.textPrimary,
+            textDisabledColor: colors.textPlaceholder,
+            selectedDayTextColor: colors.textPrimary,
+            todayTextColor: colors.textPrimary,
+            arrowColor: colors.textPrimary,
+            textDayFontWeight: fontWeight.medium,
           }}
         />
 
@@ -555,7 +560,7 @@ function WeeklySummaryCard({
       : 0;
   const barPct = Math.min(100, (ratio / 1.5) * 100);
   const barColor =
-    week.spent <= week.weeklyBudget ? "#34C759" : "#FF3B30";
+    week.spent <= week.weeklyBudget ? colors.success : colors.danger;
 
   return (
     <TouchableOpacity
@@ -582,13 +587,13 @@ function WeeklySummaryCard({
       </View>
       {week.redCount > 0 ? (
         <Text style={styles.weekRedFootnote}>
-          <Ionicons name="alert-circle" size={12} color="#F57F17" />{" "}
+          <Ionicons name="alert-circle" size={12} color={colors.warningStrong} />{" "}
           {week.redCount} day{week.redCount === 1 ? "" : "s"} had a category
           exceed its daily limit
         </Text>
       ) : (
-        <Text style={[styles.weekRedFootnote, { color: "#1B5E20" }]}>
-          <Ionicons name="checkmark-circle" size={12} color="#1B5E20" /> All
+        <Text style={[styles.weekRedFootnote, { color: colors.successText }]}>
+          <Ionicons name="checkmark-circle" size={12} color={colors.successText} /> All
           days within daily targets
         </Text>
       )}
@@ -602,66 +607,65 @@ function WeeklySummaryCard({
 const styles = StyleSheet.create({
   screenRoot: {
     flex: 1,
-    backgroundColor: "#F6F7F9",
+    backgroundColor: colors.screenBackground,
   },
   scrollOuter: {
     flex: 1,
   },
   scrollContent: {
-    paddingHorizontal: 16,
+    paddingHorizontal: spacing.md,
     paddingTop: 0,
-    paddingBottom: GRID * 4,
+    paddingBottom: spacing.xl,
   },
   calendar: {
     marginBottom: 0,
   },
 
-  /* Weekly summary section */
   weeklySection: {
-    marginTop: GRID * 3,
+    marginTop: spacing.lg,
   },
   weeklySectionTitle: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: "#111",
-    marginBottom: GRID / 2,
+    fontSize: fontSize.xl,
+    fontWeight: fontWeight.bold,
+    color: colors.textPrimary,
+    marginBottom: spacing.xxs,
   },
   weeklySectionHint: {
     fontSize: 13,
-    color: "#6B7280",
+    color: colors.textMuted,
     lineHeight: 18,
-    marginBottom: GRID * 2,
+    marginBottom: spacing.md,
   },
   weekCard: {
-    backgroundColor: "#FFF",
-    borderRadius: GRID * 1.5,
+    backgroundColor: colors.surface,
+    borderRadius: radius.lg,
     borderWidth: 1,
-    borderColor: "#E6E8EC",
-    padding: GRID * 2,
-    marginBottom: GRID * 1.5,
+    borderColor: colors.border,
+    padding: spacing.md,
+    marginBottom: spacing.sm,
   },
   weekCardHeader: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginBottom: GRID,
-    gap: GRID,
+    marginBottom: spacing.xs,
+    gap: spacing.xs,
   },
   weekRange: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: "#111",
+    fontSize: fontSize.lg,
+    fontWeight: fontWeight.bold,
+    color: colors.textPrimary,
     flex: 1,
   },
   weekSpentLine: {
-    fontSize: 14,
-    color: "#374151",
-    marginBottom: GRID,
+    fontSize: fontSize.base,
+    color: colors.textSecondary,
+    marginBottom: spacing.xs,
   },
   weekProgressTrack: {
     height: 6,
     borderRadius: 3,
-    backgroundColor: "#E9EDF2",
+    backgroundColor: colors.divider,
     overflow: "hidden",
   },
   weekProgressFill: {
@@ -669,36 +673,34 @@ const styles = StyleSheet.create({
     borderRadius: 3,
   },
   weekRedFootnote: {
-    fontSize: 12,
-    color: "#6B7280",
-    marginTop: GRID,
+    fontSize: fontSize.sm,
+    color: colors.textMuted,
+    marginTop: spacing.xs,
   },
   weekTapHint: {
-    fontSize: 11,
-    fontWeight: "600",
-    color: "#9CA3AF",
+    fontSize: fontSize.xs,
+    fontWeight: fontWeight.semibold,
+    color: colors.textPlaceholder,
     textAlign: "right",
-    marginTop: GRID,
+    marginTop: spacing.xs,
   },
 
-  /* No-budget banner */
   noBudgetBanner: {
-    marginTop: GRID * 3,
-    backgroundColor: "#FFF",
-    borderRadius: GRID,
+    marginTop: spacing.lg,
+    backgroundColor: colors.surface,
+    borderRadius: radius.md,
     borderWidth: 1,
-    borderColor: "#E6E8EC",
-    padding: GRID * 2,
+    borderColor: colors.border,
+    padding: spacing.md,
   },
   noBudgetText: {
     fontSize: 13,
-    color: "#6B7280",
+    color: colors.textMuted,
     textAlign: "center",
     lineHeight: 18,
   },
 
-  /* Sheet */
   sheetScroll: {
-    paddingBottom: GRID * 4,
+    paddingBottom: spacing.xl,
   },
 });

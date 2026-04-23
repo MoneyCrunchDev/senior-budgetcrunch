@@ -1,9 +1,11 @@
 import { useActivityCategories } from "@/context/ActivityCategoriesContext";
+import { colors, fontSize, fontWeight, radius, spacing } from "@/theme";
 import React, { useMemo } from "react";
 import { ActivityIndicator, Text, ScrollView, StyleSheet, View } from "react-native";
 import PieChart from "react-native-pie-chart";
 
-const GRID = 8;
+const CHART_SIZE = 192;
+const CHART_CENTER_SIZE = 88;
 
 function formatMoney(value: number): string {
   return `$${value.toFixed(2)}`;
@@ -11,7 +13,7 @@ function formatMoney(value: number): string {
 
 export default function Screen() {
   const { categories, ready } = useActivityCategories();
-  const widthAndHeight = GRID * 24;
+  const widthAndHeight = CHART_SIZE;
 
   const { series, totalSpent, sortedData } = useMemo(() => {
     const total = categories.reduce((sum, item) => sum + item.spent, 0);
@@ -26,7 +28,7 @@ export default function Screen() {
   if (!ready) {
     return (
       <View style={styles.loadingWrap}>
-        <ActivityIndicator size="large" color="#111" />
+        <ActivityIndicator size="large" color={colors.primary} />
       </View>
     );
   }
@@ -34,7 +36,7 @@ export default function Screen() {
   const showChart = categories.length > 0 && totalSpent > 0;
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <ScrollView style={styles.scroll} contentContainerStyle={styles.container}>
       <Text style={styles.title}>Spending Breakdown</Text>
 
       <View style={styles.card}>
@@ -130,137 +132,142 @@ export default function Screen() {
 }
 
 const styles = StyleSheet.create({
+  scroll: {
+    flex: 1,
+    backgroundColor: colors.screenBackground,
+  },
   loadingWrap: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#F6F7F9",
+    backgroundColor: colors.screenBackground,
   },
 
   emptyHint: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: "#6B7280",
+    fontSize: fontSize.base,
+    fontWeight: fontWeight.semibold,
+    color: colors.textMuted,
     textAlign: "center",
-    marginBottom: GRID * 2,
-    paddingHorizontal: GRID,
+    marginBottom: spacing.md,
+    paddingHorizontal: spacing.xs,
   },
 
   emptyChartBlock: {
-    paddingVertical: GRID * 2,
-    marginBottom: GRID * 2,
+    paddingVertical: spacing.md,
+    marginBottom: spacing.md,
   },
 
   placeholderTotals: {
     alignSelf: "center",
-    width: GRID * 11,
-    height: GRID * 11,
-    borderRadius: GRID * 5.5,
-    backgroundColor: "#FFFFFF",
+    width: CHART_CENTER_SIZE,
+    height: CHART_CENTER_SIZE,
+    borderRadius: CHART_CENTER_SIZE / 2,
+    backgroundColor: colors.surface,
     borderWidth: 1,
-    borderColor: "#E6E8EC",
+    borderColor: colors.border,
     alignItems: "center",
     justifyContent: "center",
-    marginTop: GRID,
+    marginTop: spacing.xs,
   },
 
   container: {
-    paddingHorizontal: GRID * 2, // 16
-    paddingTop: GRID * 6, // 48
-    paddingBottom: GRID * 4, // 32
-    backgroundColor: "#F6F7F9",
+    flexGrow: 1,
+    paddingHorizontal: spacing.md,
+    paddingTop: spacing.xxxl,
+    paddingBottom: spacing.xl,
+    backgroundColor: colors.screenBackground,
   },
 
   title: {
-    fontSize: 28,
-    fontWeight: "700",
-    color: "#111",
-    marginBottom: GRID * 3, // 24
+    fontSize: fontSize.heroSm,
+    fontWeight: fontWeight.bold,
+    color: colors.textPrimary,
+    marginBottom: spacing.lg,
   },
 
   card: {
-    backgroundColor: "#FFFFFF",
-    borderRadius: GRID * 1.5, // 12
-    padding: GRID * 2, // 16
+    backgroundColor: colors.surface,
+    borderRadius: radius.lg,
+    padding: spacing.md,
     borderWidth: 1,
-    borderColor: "#E6E8EC",
-    marginBottom: GRID * 2, // 16
+    borderColor: colors.border,
+    marginBottom: spacing.md,
   },
 
   cardTitle: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: "#111",
-    marginBottom: GRID * 2, // 16
+    fontSize: fontSize.xl,
+    fontWeight: fontWeight.bold,
+    color: colors.textPrimary,
+    marginBottom: spacing.md,
   },
 
   chartWrapper: {
-    width: GRID * 24, // 192
-    height: GRID * 24, // 192
+    width: CHART_SIZE,
+    height: CHART_SIZE,
     alignSelf: "center",
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: GRID * 3, // 24
+    marginBottom: spacing.lg,
     position: "relative",
   },
 
   chartCenter: {
     position: "absolute",
-    width: GRID * 11, // 88
-    height: GRID * 11, // 88
-    borderRadius: GRID * 5.5, // 44
-    backgroundColor: "#FFFFFF",
+    width: CHART_CENTER_SIZE,
+    height: CHART_CENTER_SIZE,
+    borderRadius: CHART_CENTER_SIZE / 2,
+    backgroundColor: colors.surface,
     alignItems: "center",
     justifyContent: "center",
   },
 
   chartCenterAmount: {
-    fontSize: 18,
-    fontWeight: "800",
-    color: "#111",
-    marginBottom: GRID / 2, // 4
+    fontSize: fontSize.xl,
+    fontWeight: fontWeight.extrabold,
+    color: colors.textPrimary,
+    marginBottom: spacing.xxs,
   },
 
   chartCenterLabel: {
-    fontSize: 12,
-    fontWeight: "600",
-    color: "#6B7280",
+    fontSize: fontSize.sm,
+    fontWeight: fontWeight.semibold,
+    color: colors.textMuted,
   },
 
   legend: {
-    gap: GRID * 1.5, // 12
+    gap: spacing.sm,
   },
 
   legendRow: {
-    minHeight: GRID * 6, // 48
+    minHeight: spacing.xxl - spacing.xs,
     borderWidth: 1,
-    borderColor: "#E6E8EC",
-    borderRadius: GRID, // 8
-    paddingHorizontal: GRID * 2, // 16
+    borderColor: colors.border,
+    borderRadius: radius.md,
+    paddingHorizontal: spacing.md,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.surface,
   },
 
   legendLeft: {
     flexDirection: "row",
     alignItems: "center",
     flex: 1,
-    marginRight: GRID * 2, // 16
+    marginRight: spacing.md,
   },
 
   legendDot: {
-    width: GRID * 1.5, // 12
-    height: GRID * 1.5, // 12
-    borderRadius: GRID, // 8
-    marginRight: GRID * 1.5, // 12
+    width: spacing.sm,
+    height: spacing.sm,
+    borderRadius: radius.md,
+    marginRight: spacing.sm,
   },
 
   legendLabel: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#111",
+    fontSize: fontSize.lg,
+    fontWeight: fontWeight.semibold,
+    color: colors.textPrimary,
   },
 
   legendRight: {
@@ -268,35 +275,35 @@ const styles = StyleSheet.create({
   },
 
   legendAmount: {
-    fontSize: 14,
-    fontWeight: "700",
-    color: "#111",
+    fontSize: fontSize.base,
+    fontWeight: fontWeight.bold,
+    color: colors.textPrimary,
   },
 
   legendPercent: {
-    fontSize: 12,
-    color: "#6B7280",
-    marginTop: GRID / 2, // 4
+    fontSize: fontSize.sm,
+    color: colors.textMuted,
+    marginTop: spacing.xxs,
   },
 
   summaryRow: {
-    minHeight: GRID * 6, // 48
+    minHeight: spacing.xxl - spacing.xs,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     borderBottomWidth: 1,
-    borderBottomColor: "#EEF1F4",
+    borderBottomColor: colors.divider,
   },
 
   summaryLabel: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#111",
+    fontSize: fontSize.lg,
+    fontWeight: fontWeight.semibold,
+    color: colors.textPrimary,
   },
 
   summaryValue: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: "#111",
+    fontSize: fontSize.lg,
+    fontWeight: fontWeight.bold,
+    color: colors.textPrimary,
   },
 });

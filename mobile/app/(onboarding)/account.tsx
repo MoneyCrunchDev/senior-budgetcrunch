@@ -16,6 +16,7 @@ import PagerView from 'react-native-pager-view';
 import { useAuth } from '@/context/AuthContext';
 import { account } from '@/lib/appwriteConfig';
 import { usDisplayToE164 } from '@/lib/phoneE164';
+import { colors, fontSize, fontWeight, radius, spacing } from '@/theme';
 
 /** Indices must stay aligned with ONBOARDING_QUESTIONS. */
 const Q = {
@@ -162,7 +163,7 @@ export default function AccountScreen() {
               <TextInput
                 style={[styles.input, { width: '80%' }]}
                 placeholder={question.type === 'number' ? 'Enter a number…' : 'Type your answer here…'}
-                placeholderTextColor="grey"
+                placeholderTextColor={colors.textPlaceholder}
                 keyboardType={question.type === 'pnumber' ? 'phone-pad' : question.type === 'number' ? 'number-pad' : 'default'}
                 value={answers[index] || ''}
                 onChangeText={(text) => {
@@ -201,16 +202,16 @@ export default function AccountScreen() {
             )}
 
             {index < ONBOARDING_QUESTIONS.length - 1 ? (
-              <Text style={[styles.footerText, { marginTop: 20 }]}>Swipe ➡️</Text>
+              <Text style={[styles.footerText, { marginTop: spacing.mdLg }]}>Swipe ➡️</Text>
             ) : (
-              <Text style={[styles.footerText, { marginTop: 20 }]}>Swipe to Review ➡️</Text>
+              <Text style={[styles.footerText, { marginTop: spacing.mdLg }]}>Swipe to Review ➡️</Text>
             )}
 
             {hasReachedReview && (
               <TouchableOpacity
-                style={[styles.button, { marginTop: 20 }]}
+                style={[styles.button, { marginTop: spacing.mdLg }]}
                 onPress={() => pagerRef.current?.setPage(ONBOARDING_QUESTIONS.length)}>
-                <Text style={{ color: 'white', fontWeight: 'bold' }}>Jump back to Review</Text>
+                <Text style={styles.buttonText}>Jump back to Review</Text>
               </TouchableOpacity>
             )}
           </View>
@@ -227,7 +228,7 @@ export default function AccountScreen() {
                     {answers[i] ? (
                       answers[i]
                     ) : (
-                      <Text style={{ fontStyle: 'italic', color: 'grey' }}>Left blank</Text>
+                      <Text style={styles.reviewAnswerBlank}>Left blank</Text>
                     )}
                   </Text>
                   <TouchableOpacity onPress={() => pagerRef.current?.setPage(i)}>
@@ -244,9 +245,9 @@ export default function AccountScreen() {
             onPress={handleSubmit}
             disabled={submitting}>
             {submitting ? (
-              <ActivityIndicator color="#fff" />
+              <ActivityIndicator color={colors.textOnPrimary} />
             ) : (
-              <Text style={{ color: 'white', fontWeight: 'bold', paddingHorizontal: 10 }}>Submit</Text>
+              <Text style={styles.submitButtonText}>Submit</Text>
             )}
           </TouchableOpacity>
         </View>
@@ -256,76 +257,89 @@ export default function AccountScreen() {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: 'white' },
+  safe: { flex: 1, backgroundColor: colors.screenBackground },
   container: { flex: 1 },
   headline: {
     textAlign: 'center',
-    fontSize: 20,
-    marginBottom: 20,
-    fontWeight: '700',
-    paddingHorizontal: 20,
+    fontSize: fontSize.xxl,
+    marginBottom: spacing.mdLg,
+    fontWeight: fontWeight.bold,
+    color: colors.textPrimary,
+    paddingHorizontal: spacing.mdLg,
   },
   input: {
     borderWidth: 1,
-    borderRadius: 10,
-    padding: 15,
-    marginTop: 10,
-    marginBottom: 10,
-    borderColor: 'grey',
-    fontSize: 16,
+    borderRadius: radius.md,
+    padding: spacing.sm,
+    marginTop: spacing.xs,
+    marginBottom: spacing.xs,
+    borderColor: colors.border,
+    backgroundColor: colors.surface,
+    color: colors.textPrimary,
+    fontSize: fontSize.lg,
   },
   page: { justifyContent: 'center', alignItems: 'center', flex: 1 },
-  footerText: { color: '#333', fontWeight: '600' },
+  footerText: { color: colors.textSecondary, fontWeight: fontWeight.semibold },
   button: {
-    marginTop: 8,
-    paddingHorizontal: 10,
-    paddingVertical: 10,
-    borderRadius: 6,
-    backgroundColor: '#007AFF',
+    marginTop: spacing.xs,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.xs,
+    borderRadius: radius.sm,
+    backgroundColor: colors.primary,
     alignSelf: 'center',
     minWidth: 120,
     alignItems: 'center',
   },
-  submitButton: { backgroundColor: '#34C759' },
+  buttonText: {
+    color: colors.textOnPrimary,
+    fontWeight: fontWeight.bold,
+  },
+  submitButton: { backgroundColor: colors.accent },
+  submitButtonText: {
+    color: colors.textOnPrimary,
+    fontWeight: fontWeight.bold,
+    paddingHorizontal: spacing.sm,
+  },
   buttonDisabled: { opacity: 0.6 },
   reviewScroll: { maxHeight: '45%', width: '100%' },
-  reviewScrollContent: { paddingHorizontal: '10%', paddingBottom: 8 },
+  reviewScrollContent: { paddingHorizontal: '10%', paddingBottom: spacing.xs },
   reviewItem: {
-    marginBottom: 15,
+    marginBottom: spacing.sm,
     borderBottomWidth: 1,
-    borderBottomColor: '#eee',
-    paddingBottom: 10,
+    borderBottomColor: colors.divider,
+    paddingBottom: spacing.xs,
   },
-  reviewQuestion: { fontSize: 14, color: '#666', marginBottom: 4 },
+  reviewQuestion: { fontSize: fontSize.base, color: colors.textMuted, marginBottom: spacing.hair },
   reviewAnswerRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  reviewAnswer: { fontSize: 16, fontWeight: '500', flex: 1 },
-  editText: { color: '#007AFF', fontWeight: '600', marginLeft: 10 },
+  reviewAnswer: { fontSize: fontSize.lg, fontWeight: fontWeight.medium, color: colors.textPrimary, flex: 1 },
+  reviewAnswerBlank: { fontStyle: 'italic', color: colors.textPlaceholder },
+  editText: { color: colors.textPrimary, fontWeight: fontWeight.semibold, marginLeft: spacing.xs },
   errorText: {
-    color: '#b00020',
-    marginTop: 8,
-    marginHorizontal: 24,
+    color: colors.danger,
+    marginTop: spacing.xs,
+    marginHorizontal: spacing.lg,
     textAlign: 'center',
     fontSize: 13,
   },
   optionButton: {
-    padding: 15,
+    padding: spacing.sm,
     borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 8,
-    marginBottom: 10,
-    backgroundColor: '#fff',
+    borderColor: colors.borderStrong,
+    borderRadius: radius.md,
+    marginBottom: spacing.xs,
+    backgroundColor: colors.surface,
   },
   optionButtonSelected: {
-    borderColor: '#007AFF',
-    backgroundColor: '#E5F1FF',
+    borderColor: colors.accent,
+    backgroundColor: colors.surface,
   },
   optionText: {
-    fontSize: 16,
-    color: '#333',
+    fontSize: fontSize.lg,
+    color: colors.textSecondary,
     textAlign: 'center',
   },
   optionTextSelected: {
-    color: '#007AFF',
-    fontWeight: 'bold',
+    color: colors.textPrimary,
+    fontWeight: fontWeight.bold,
   },
 });

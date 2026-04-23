@@ -15,8 +15,7 @@ import { BottomSheetScrollView } from "@gorhom/bottom-sheet";
 import { router } from "expo-router";
 import { useAuth } from "@/context/AuthContext";
 import { getLinkedItems, type LinkedItem } from "@/lib/plaidApi";
-
-const GRID = 8;
+import { colors, fontSize, fontWeight, radius, spacing } from "@/theme";
 
 export type LinkedBanksSheetContentProps = {
   /** Called when the sheet should close (e.g. before navigating to bank-connect). */
@@ -68,7 +67,11 @@ export default function LinkedBanksSheetContent({
       <Text style={styles.title}>Linked Bank Accounts</Text>
 
       {loading && (
-        <ActivityIndicator size="large" style={{ marginTop: GRID * 4 }} />
+        <ActivityIndicator
+          size="large"
+          color={colors.primary}
+          style={{ marginTop: spacing.xl }}
+        />
       )}
 
       {!loading && error && (
@@ -96,7 +99,7 @@ export default function LinkedBanksSheetContent({
                   Linked on {new Date(item.linkedAt).toLocaleDateString()}
                 </Text>
               ) : null}
-              <Text style={[styles.itemLabel, { marginTop: GRID }]}>
+              <Text style={[styles.itemLabel, { marginTop: spacing.xs }]}>
                 Connection ID
               </Text>
               <Text style={styles.itemIdMuted} selectable>
@@ -119,74 +122,74 @@ export default function LinkedBanksSheetContent({
 
 const styles = StyleSheet.create({
   container: {
-    paddingBottom: GRID * 4,
+    paddingBottom: spacing.xl,
   },
   title: {
     fontSize: 22,
-    fontWeight: "700",
-    marginBottom: GRID * 3,
-    color: "#111",
+    fontWeight: fontWeight.bold,
+    marginBottom: spacing.lg,
+    color: colors.textPrimary,
   },
   card: {
-    backgroundColor: "#F6F7F9",
-    borderRadius: GRID * 1.5,
-    padding: GRID * 2,
-    marginBottom: GRID * 2,
+    backgroundColor: colors.surfaceAlt,
+    borderRadius: radius.lg,
+    padding: spacing.md,
+    marginBottom: spacing.md,
     borderWidth: 1,
-    borderColor: "#E6E8EC",
+    borderColor: colors.border,
   },
   bankTitle: {
     fontSize: 17,
-    fontWeight: "700",
-    color: "#111",
+    fontWeight: fontWeight.bold,
+    color: colors.textPrimary,
   },
   linkedMeta: {
     fontSize: 13,
-    color: "#666",
-    marginTop: 4,
+    color: colors.textMuted,
+    marginTop: spacing.xxs,
   },
   itemLabel: {
-    fontSize: 12,
-    fontWeight: "600",
-    color: "#888",
+    fontSize: fontSize.sm,
+    fontWeight: fontWeight.semibold,
+    color: colors.textMuted,
     textTransform: "uppercase",
     letterSpacing: 0.5,
   },
   itemValue: {
-    fontSize: 15,
-    fontWeight: "500",
-    color: "#222",
+    fontSize: fontSize.md,
+    fontWeight: fontWeight.medium,
+    color: colors.textPrimary,
     marginTop: 2,
   },
   itemIdMuted: {
-    fontSize: 12,
-    fontWeight: "400",
-    color: "#999",
+    fontSize: fontSize.sm,
+    fontWeight: fontWeight.regular,
+    color: colors.textPlaceholder,
     marginTop: 2,
   },
   emptyText: {
-    fontSize: 15,
-    color: "#666",
+    fontSize: fontSize.md,
+    color: colors.textMuted,
     textAlign: "center",
-    paddingVertical: GRID * 2,
+    paddingVertical: spacing.md,
   },
   errorText: {
-    fontSize: 15,
-    color: "#D32F2F",
+    fontSize: fontSize.md,
+    color: colors.danger,
     textAlign: "center",
-    paddingVertical: GRID,
+    paddingVertical: spacing.xs,
   },
   addButton: {
-    height: GRID * 7,
-    borderRadius: GRID,
-    backgroundColor: "#2ECC71",
+    height: spacing.xxl + spacing.sm,
+    borderRadius: radius.md,
+    backgroundColor: colors.primary,
     alignItems: "center",
     justifyContent: "center",
-    marginTop: GRID * 2,
+    marginTop: spacing.md,
   },
   addButtonText: {
-    color: "#FFF",
-    fontSize: 16,
-    fontWeight: "700",
+    color: colors.textOnPrimary,
+    fontSize: fontSize.lg,
+    fontWeight: fontWeight.bold,
   },
 });

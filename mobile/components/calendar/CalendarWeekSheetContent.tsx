@@ -1,5 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { StyleSheet, Text, View } from "react-native";
+import { colors, fontSize, fontWeight } from "@/theme";
 import type { WeekInsight } from "./sheetTypes";
 import { sheetContentStyles as styles } from "./sheetContentStyles";
 import { formatDateShort, formatMoney, STATUS_META } from "./sheetUtils";
@@ -56,7 +57,7 @@ export default function CalendarWeekSheetContent({ insight }: Props) {
 
         {worstCat ? (
           <View style={localStyles.heroFooterCallout}>
-            <Ionicons name="trending-up" size={18} color="#C62828" />
+            <Ionicons name="trending-up" size={18} color={colors.dangerText} />
             <View style={styles.insightCalloutBody}>
               <Text style={styles.insightCalloutLabel}>Largest weekly overrun</Text>
               <Text style={styles.insightCalloutValue} numberOfLines={2}>
@@ -67,7 +68,7 @@ export default function CalendarWeekSheetContent({ insight }: Props) {
           </View>
         ) : insight.redCount === 0 ? (
           <View style={localStyles.heroFooterCallout}>
-            <Ionicons name="checkmark-circle" size={18} color="#1B5E20" />
+            <Ionicons name="checkmark-circle" size={18} color={colors.successStrong} />
             <View style={styles.insightCalloutBody}>
               <Text style={styles.insightCalloutLabel}>Weekly pacing</Text>
               <Text style={styles.insightCalloutValue}>
@@ -104,11 +105,11 @@ export default function CalendarWeekSheetContent({ insight }: Props) {
                 : 0;
             const spentColor =
               row.isOver
-                ? "#FF3B30"
+                ? colors.danger
                 : row.spent <= 0
-                  ? "#111827"
-                  : "#34C759";
-            const barColor = row.isOver ? "#FF3B30" : "#34C759";
+                  ? colors.textPrimary
+                  : colors.success;
+            const barColor = row.isOver ? colors.danger : colors.success;
             return (
               <View key={row.slug} style={styles.catBlock}>
                 <View style={styles.catBlockTop}>
@@ -145,9 +146,14 @@ export default function CalendarWeekSheetContent({ insight }: Props) {
             <View style={[styles.catBlock, localStyles.catBlockLast]}>
               <View style={styles.catBlockTop}>
                 <View style={styles.catLeft}>
-                  <View style={[styles.catDot, { backgroundColor: "#9CA3AF" }]} />
+                  <View
+                    style={[
+                      styles.catDot,
+                      { backgroundColor: colors.textPlaceholder },
+                    ]}
+                  />
                   <View style={{ flex: 1, minWidth: 0 }}>
-                    <Text style={[styles.catName, { color: "#6B7280" }]}>
+                    <Text style={[styles.catName, { color: colors.textMuted }]}>
                       Other spend
                     </Text>
                     <Text style={localStyles.catSubLabel}>
@@ -156,7 +162,7 @@ export default function CalendarWeekSheetContent({ insight }: Props) {
                     </Text>
                   </View>
                 </View>
-                <Text style={[styles.catAmount, { color: "#6B7280" }]}>
+                <Text style={[styles.catAmount, { color: colors.textMuted }]}>
                   {formatMoney(insight.unbudgetedTotal)}
                 </Text>
               </View>
@@ -184,17 +190,17 @@ const localStyles = StyleSheet.create({
     paddingTop: 12,
     marginTop: 4,
     borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: "#D1D5DB",
+    borderTopColor: colors.borderStrong,
   },
   catBlockLast: {
     borderBottomWidth: 0,
     paddingBottom: 0,
   },
   catSubLabel: {
-    fontSize: 11,
-    color: "#9CA3AF",
+    fontSize: fontSize.xs,
+    color: colors.textPlaceholder,
     lineHeight: 15,
     marginTop: 2,
-    fontWeight: "500",
+    fontWeight: fontWeight.medium,
   },
 });

@@ -1,4 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
+import { colors } from "@/theme";
 import type { WeekSummaryStatus } from "./sheetTypes";
 
 export const MONTHS = [
@@ -47,8 +48,8 @@ export const STATUS_META: Record<
 > = {
   track: {
     label: "On Track",
-    bg: "#E8F5E9",
-    fg: "#1B5E20",
+    bg: colors.successSoft,
+    fg: colors.successText,
     icon: "checkmark-circle",
     shortExplanation:
       "No day had a budgeted category go over its daily target.",
@@ -57,8 +58,8 @@ export const STATUS_META: Record<
   },
   caution: {
     label: "Needs Attention",
-    bg: "#FFF9C4",
-    fg: "#F57F17",
+    bg: colors.warningSoft,
+    fg: colors.warningStrong,
     icon: "alert-circle",
     shortExplanation:
       "1–2 days had at least one budgeted category over its daily target.",
@@ -67,8 +68,8 @@ export const STATUS_META: Record<
   },
   over: {
     label: "Off Track",
-    bg: "#FFEBEE",
-    fg: "#C62828",
+    bg: colors.dangerSoft,
+    fg: colors.dangerText,
     icon: "warning",
     shortExplanation:
       "3+ days had a budgeted category over its daily target.",

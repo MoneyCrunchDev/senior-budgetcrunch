@@ -1,4 +1,5 @@
 import { useAuth } from '@/context/AuthContext';
+import { colors, spacing } from '@/theme';
 import { Redirect, Stack } from 'expo-router';
 import { ActivityIndicator, SafeAreaView, Text } from 'react-native';
 
@@ -7,9 +8,17 @@ export default function AuthLayout() {
 
   if (loading) {
     return (
-      <SafeAreaView style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-        <ActivityIndicator />
-        <Text style={{ marginTop: 12 }}>Loading…</Text>
+      <SafeAreaView
+        style={{
+          flex: 1,
+          alignItems: 'center',
+          justifyContent: 'center',
+          backgroundColor: colors.screenBackground,
+        }}>
+        <ActivityIndicator color={colors.primary} />
+        <Text style={{ marginTop: spacing.sm, color: colors.textSecondary }}>
+          Loading…
+        </Text>
       </SafeAreaView>
     );
   }

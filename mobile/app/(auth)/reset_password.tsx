@@ -5,6 +5,7 @@ import { SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, View } fro
 
 import TextCustom from '@/components/TextCustom';
 import { account } from '@/lib/appwriteConfig';
+import { colors, fontSize, fontWeight, radius, spacing } from '@/theme';
 
 type ResetParams = {
   userId?: string;
@@ -78,6 +79,7 @@ export default function ResetPassword() {
           <TextInput
             style={styles.passwordInput}
             placeholder="At least 8 characters"
+            placeholderTextColor={colors.textPlaceholder}
             value={password}
             onChangeText={setPassword}
             secureTextEntry={!showNewPassword}
@@ -94,7 +96,7 @@ export default function ResetPassword() {
             <Ionicons
               name={showNewPassword ? 'eye-outline' : 'eye-off-outline'}
               size={22}
-              color="#666"
+              color={colors.textMuted}
             />
           </TouchableOpacity>
         </View>
@@ -104,6 +106,7 @@ export default function ResetPassword() {
           <TextInput
             style={styles.passwordInput}
             placeholder="Re-enter password"
+            placeholderTextColor={colors.textPlaceholder}
             value={confirmPassword}
             onChangeText={setConfirmPassword}
             secureTextEntry={!showConfirmPassword}
@@ -120,7 +123,7 @@ export default function ResetPassword() {
             <Ionicons
               name={showConfirmPassword ? 'eye-outline' : 'eye-off-outline'}
               size={22}
-              color="#666"
+              color={colors.textMuted}
             />
           </TouchableOpacity>
         </View>
@@ -144,75 +147,80 @@ export default function ResetPassword() {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: 'white',
+    backgroundColor: colors.screenBackground,
   },
   container: {
     flex: 1,
-    padding: 24,
+    padding: spacing.lg,
     justifyContent: 'center',
   },
   headline: {
     textAlign: 'center',
-    marginBottom: 32,
-    fontWeight: '700',
+    marginBottom: spacing.xl,
+    fontWeight: fontWeight.bold,
     fontStyle: 'italic',
+    color: colors.textPrimary,
   },
   input: {
     borderWidth: 1,
-    borderRadius: 8,
-    padding: 16,
-    marginTop: 8,
-    marginBottom: 8,
-    borderColor: 'grey',
+    borderRadius: radius.md,
+    padding: spacing.md,
+    marginTop: spacing.xs,
+    marginBottom: spacing.xs,
+    borderColor: colors.border,
+    backgroundColor: colors.surface,
+    color: colors.textPrimary,
   },
   passwordRow: {
     flexDirection: 'row',
     alignItems: 'center',
     borderWidth: 1,
-    borderRadius: 8,
-    borderColor: 'grey',
-    marginTop: 8,
-    marginBottom: 8,
+    borderRadius: radius.md,
+    borderColor: colors.border,
+    backgroundColor: colors.surface,
+    marginTop: spacing.xs,
+    marginBottom: spacing.xs,
   },
   passwordInput: {
     flex: 1,
-    paddingVertical: 16,
-    paddingLeft: 16,
-    paddingRight: 8,
+    paddingVertical: spacing.md,
+    paddingLeft: spacing.md,
+    paddingRight: spacing.xs,
+    color: colors.textPrimary,
   },
   eyeButton: {
-    padding: 8,
+    padding: spacing.xs,
   },
   button: {
-    backgroundColor: 'black',
-    padding: 16,
-    borderRadius: 8,
+    backgroundColor: colors.primary,
+    padding: spacing.md,
+    borderRadius: radius.md,
     alignItems: 'center',
-    marginTop: 16,
+    marginTop: spacing.md,
   },
   buttonDisabled: {
     opacity: 0.6,
   },
   buttonText: {
-    color: 'white',
-    fontSize: 18,
-    fontWeight: '600',
+    color: colors.textOnPrimary,
+    fontSize: fontSize.xl,
+    fontWeight: fontWeight.semibold,
   },
   errorText: {
-    color: '#b00020',
-    marginBottom: 16,
+    color: colors.danger,
+    marginBottom: spacing.md,
   },
   successText: {
-    color: '#0d7a2d',
-    marginBottom: 16,
+    color: colors.successText,
+    marginBottom: spacing.md,
   },
   linkWrap: {
-    marginTop: 16,
+    marginTop: spacing.md,
     alignItems: 'center',
   },
   linkText: {
     textDecorationLine: 'underline',
-    fontWeight: '600',
-    color: '#333',
+    fontWeight: fontWeight.semibold,
+    color: colors.link,
   },
 });

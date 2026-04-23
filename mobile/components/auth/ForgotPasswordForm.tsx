@@ -5,6 +5,7 @@ import { StyleSheet, Text, TouchableOpacity } from 'react-native';
 
 import TextCustom from '@/components/TextCustom';
 import { account } from '@/lib/appwriteConfig';
+import { colors, fontSize, fontWeight, radius, spacing } from '@/theme';
 
 type ForgotPasswordFormProps = {
   /** Email to prefill (e.g. from login screen). Updated when parent opens sheet again. */
@@ -75,6 +76,7 @@ export default function ForgotPasswordForm({ prefilledEmail = '' }: ForgotPasswo
       <TextCustom>Email</TextCustom>
       <BottomSheetTextInput
         placeholder="you@example.com"
+        placeholderTextColor={colors.textPlaceholder}
         style={styles.input}
         value={email}
         onChangeText={setEmail}
@@ -96,43 +98,46 @@ export default function ForgotPasswordForm({ prefilledEmail = '' }: ForgotPasswo
 const styles = StyleSheet.create({
   sheetTitle: {
     textAlign: 'center',
-    fontWeight: '700',
+    fontWeight: fontWeight.bold,
     fontStyle: 'italic',
+    color: colors.textPrimary,
   },
   sheetSubtitle: {
     textAlign: 'center',
-    color: '#444',
-    marginBottom: 16,
+    color: colors.textSecondary,
+    marginBottom: spacing.md,
   },
   input: {
     borderWidth: 1,
-    borderRadius: 8,
-    padding: 16,
-    marginTop: 8,
-    marginBottom: 8,
-    borderColor: 'grey',
+    borderRadius: radius.md,
+    padding: spacing.md,
+    marginTop: spacing.xs,
+    marginBottom: spacing.xs,
+    borderColor: colors.border,
+    backgroundColor: colors.surface,
+    color: colors.textPrimary,
   },
   button: {
-    backgroundColor: 'black',
-    padding: 16,
-    borderRadius: 8,
+    backgroundColor: colors.primary,
+    padding: spacing.md,
+    borderRadius: radius.md,
     alignItems: 'center',
-    marginTop: 16,
+    marginTop: spacing.md,
   },
   buttonDisabled: {
     opacity: 0.6,
   },
   buttonText: {
-    color: 'white',
-    fontSize: 18,
-    fontWeight: '600',
+    color: colors.textOnPrimary,
+    fontSize: fontSize.xl,
+    fontWeight: fontWeight.semibold,
   },
   errorText: {
-    color: '#b00020',
-    marginBottom: 16,
+    color: colors.danger,
+    marginBottom: spacing.md,
   },
   successText: {
-    color: '#0d7a2d',
-    marginBottom: 16,
+    color: colors.successText,
+    marginBottom: spacing.md,
   },
 });

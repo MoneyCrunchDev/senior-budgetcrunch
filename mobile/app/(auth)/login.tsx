@@ -9,6 +9,7 @@ import ForgotPasswordForm from '@/components/auth/ForgotPasswordForm';
 import ModalBottomSheet from '@/components/ModalBottomSheet';
 import TextCustom from '@/components/TextCustom';
 import { useAuth } from '@/context/AuthContext';
+import { colors, fontSize, fontWeight, radius, spacing } from '@/theme';
 
 export default function Login() {
   const { signin: signIn, clearPasswordForPhoneSetup } = useAuth();
@@ -74,6 +75,7 @@ export default function Login() {
             <TextCustom>Email</TextCustom>
             <TextInput
               placeholder="you@example.com"
+              placeholderTextColor={colors.textPlaceholder}
               style={styles.input}
               value={email}
               onChangeText={setEmail}
@@ -87,6 +89,7 @@ export default function Login() {
               <TextInput
                 style={styles.passwordInput}
                 placeholder="Password"
+                placeholderTextColor={colors.textPlaceholder}
                 value={password}
                 onChangeText={setPassword}
                 secureTextEntry={!showPassword}
@@ -101,7 +104,7 @@ export default function Login() {
                 <Ionicons
                   name={showPassword ? 'eye-outline' : 'eye-off-outline'}
                   size={22}
-                  color="#666"
+                  color={colors.textMuted}
                 />
               </TouchableOpacity>
             </View>
@@ -136,84 +139,89 @@ export default function Login() {
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    backgroundColor: 'white',
+    backgroundColor: colors.screenBackground,
   },
   safe: {
     flex: 1,
-    backgroundColor: 'white',
+    backgroundColor: colors.screenBackground,
   },
   container: {
     flex: 1,
-    padding: 24,
+    padding: spacing.lg,
     justifyContent: 'center',
   },
   headline: {
     textAlign: 'center',
     marginTop: -96,
-    marginBottom: 48,
-    fontWeight: '700',
+    marginBottom: spacing.xxxl,
+    fontWeight: fontWeight.bold,
     fontStyle: 'italic',
+    color: colors.primary,
   },
   subtitle: {
     textAlign: 'center',
-    marginBottom: 32,
-    fontWeight: '400',
-    fontSize: 16,
-    color: '#666',
+    marginBottom: spacing.xl,
+    fontWeight: fontWeight.regular,
+    fontSize: fontSize.lg,
+    color: colors.textMuted,
   },
   input: {
     borderWidth: 1,
-    borderRadius: 8,
-    padding: 16,
-    marginTop: 8,
-    marginBottom: 8,
-    borderColor: 'grey',
+    borderRadius: radius.md,
+    padding: spacing.md,
+    marginTop: spacing.xs,
+    marginBottom: spacing.xs,
+    borderColor: colors.border,
+    backgroundColor: colors.surface,
+    color: colors.textPrimary,
   },
   passwordRow: {
     flexDirection: 'row',
     alignItems: 'center',
     borderWidth: 1,
-    borderRadius: 8,
-    borderColor: 'grey',
-    marginTop: 8,
-    marginBottom: 8,
+    borderRadius: radius.md,
+    borderColor: colors.border,
+    backgroundColor: colors.surface,
+    marginTop: spacing.xs,
+    marginBottom: spacing.xs,
   },
   passwordInput: {
     flex: 1,
-    paddingVertical: 16,
-    paddingLeft: 16,
-    paddingRight: 8,
+    paddingVertical: spacing.md,
+    paddingLeft: spacing.md,
+    paddingRight: spacing.xs,
+    color: colors.textPrimary,
   },
   eyeButton: {
-    padding: 8,
+    padding: spacing.xs,
   },
   button: {
-    backgroundColor: 'black',
-    padding: 16,
-    borderRadius: 8,
+    backgroundColor: colors.primary,
+    padding: spacing.md,
+    borderRadius: radius.md,
     alignItems: 'center',
-    marginTop: 16,
+    marginTop: spacing.md,
   },
   buttonDisabled: {
     opacity: 0.6,
   },
   buttonText: {
-    color: 'white',
-    fontSize: 18,
-    fontWeight: '600',
+    color: colors.textOnPrimary,
+    fontSize: fontSize.xl,
+    fontWeight: fontWeight.semibold,
   },
   errorText: {
-    color: '#b00020',
-    marginBottom: 16,
+    color: colors.danger,
+    marginBottom: spacing.md,
   },
   linksRow: {
-    marginTop: 16,
+    marginTop: spacing.md,
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
   linkText: {
     textDecorationLine: 'underline',
-    fontWeight: '600',
-    color: '#333',
+    fontWeight: fontWeight.semibold,
+    color: colors.link,
   },
-})
+});

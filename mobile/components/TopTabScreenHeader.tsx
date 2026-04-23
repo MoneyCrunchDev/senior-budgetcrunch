@@ -1,6 +1,8 @@
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { StyleSheet, Text, View } from 'react-native';
 
+import { colors, fontSize, fontWeight, spacing } from '@/theme';
+
 type TopTabScreenHeaderProps = {
   title: string;
 };
@@ -17,16 +19,16 @@ export function TopTabScreenHeader({ title }: TopTabScreenHeaderProps) {
 
 const styles = StyleSheet.create({
   header: {
-    backgroundColor: 'white',
-    paddingBottom: 12,
-    paddingHorizontal: 16,
+    backgroundColor: colors.surface,
+    paddingBottom: spacing.sm,
+    paddingHorizontal: spacing.md,
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: '#E0E0E0',
+    borderBottomColor: colors.border,
     alignItems: 'center',
   },
   title: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: '#1a1a1a',
+    fontSize: fontSize.xxl,
+    fontWeight: fontWeight.semibold,
+    color: colors.textPrimary,
   },
 });

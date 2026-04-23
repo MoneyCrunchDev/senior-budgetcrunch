@@ -4,6 +4,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 import TextCustom from '@/components/TextCustom';
+import { colors, fontSize, fontWeight, radius, spacing } from '@/theme';
 
 type PermissionState = {
   status: Notifications.PermissionStatus | 'unknown';
@@ -62,8 +63,8 @@ export default function NotificationPermissionScreen() {
     return (
       <SafeAreaView style={styles.safe}>
         <View style={styles.center}>
-          <ActivityIndicator />
-          <Text style={{ marginTop: 12 }}>Loading…</Text>
+          <ActivityIndicator color={colors.primary} />
+          <Text style={styles.loadingText}>Loading…</Text>
         </View>
       </SafeAreaView>
     );
@@ -115,81 +116,88 @@ export default function NotificationPermissionScreen() {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: 'white',
+    backgroundColor: colors.screenBackground,
   },
   center: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
   },
+  loadingText: {
+    marginTop: spacing.sm,
+    color: colors.textSecondary,
+  },
   container: {
     flex: 1,
-    padding: 20,
+    padding: spacing.mdLg,
     justifyContent: 'center',
   },
   title: {
-    fontWeight: '800',
-    marginBottom: 8,
+    fontWeight: fontWeight.extrabold,
+    marginBottom: spacing.xs,
   },
   subtitle: {
-    color: '#333',
+    color: colors.textSecondary,
     marginBottom: 18,
     lineHeight: 20,
   },
   errorText: {
-    color: '#b00020',
-    marginBottom: 12,
+    color: colors.danger,
+    marginBottom: spacing.sm,
   },
   card: {
     borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 12,
-    padding: 14,
-    marginBottom: 16,
+    borderColor: colors.border,
+    backgroundColor: colors.surface,
+    borderRadius: radius.lg,
+    padding: spacing.sm + 2,
+    marginBottom: spacing.md,
   },
   cardLabel: {
-    color: '#666',
-    marginBottom: 4,
+    color: colors.textMuted,
+    marginBottom: spacing.hair,
   },
   cardValue: {
-    fontSize: 18,
-    fontWeight: '700',
+    fontSize: fontSize.xl,
+    fontWeight: fontWeight.bold,
+    color: colors.textPrimary,
   },
   cardHint: {
-    marginTop: 8,
-    color: '#666',
+    marginTop: spacing.xs,
+    color: colors.textMuted,
   },
   primaryButton: {
-    backgroundColor: 'black',
-    padding: 12,
-    borderRadius: 10,
+    backgroundColor: colors.primary,
+    padding: spacing.sm,
+    borderRadius: radius.md,
     alignItems: 'center',
   },
   primaryButtonText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: '700',
+    color: colors.textOnPrimary,
+    fontSize: fontSize.lg,
+    fontWeight: fontWeight.bold,
   },
   buttonDisabled: {
     opacity: 0.6,
   },
   row: {
     flexDirection: 'row',
-    gap: 12,
-    marginTop: 12,
+    gap: spacing.sm,
+    marginTop: spacing.sm,
   },
   secondaryButton: {
     flex: 1,
     borderWidth: 1,
-    borderColor: '#ddd',
-    padding: 12,
-    borderRadius: 10,
+    borderColor: colors.border,
+    backgroundColor: colors.surface,
+    padding: spacing.sm,
+    borderRadius: radius.md,
     alignItems: 'center',
   },
   secondaryButtonText: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: '#222',
+    fontSize: fontSize.base,
+    fontWeight: fontWeight.bold,
+    color: colors.textPrimary,
   },
 });
 

@@ -1,6 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { StyleSheet, Text, View } from "react-native";
 import { getPrimaryLabel } from "@/lib/categoryHelpers";
+import { colors, fontSize, fontWeight } from "@/theme";
 import type { DaySummary } from "./sheetTypes";
 import { sheetContentStyles as styles } from "./sheetContentStyles";
 import { formatDateNice, formatMoney } from "./sheetUtils";
@@ -50,13 +51,21 @@ export default function CalendarDaySheetContent({ summary, dateStr }: Props) {
             <View
               style={[
                 styles.weekBadge,
-                { backgroundColor: isRedDay ? "#FFEBEE" : "#E8F5E9" },
+                {
+                  backgroundColor: isRedDay
+                    ? colors.dangerSoft
+                    : colors.successSoft,
+                },
               ]}
             >
               <Text
                 style={[
                   styles.weekBadgeText,
-                  { color: isRedDay ? "#C62828" : "#1B5E20" },
+                  {
+                    color: isRedDay
+                      ? colors.dangerText
+                      : colors.successStrong,
+                  },
                 ]}
               >
                 {isRedDay ? "Over daily target" : "Within daily target"}
@@ -75,10 +84,10 @@ export default function CalendarDaySheetContent({ summary, dateStr }: Props) {
             {
               color:
                 totalSpent === 0
-                  ? "#6B7280"
+                  ? colors.textMuted
                   : isRedDay
-                    ? "#DC2626"
-                    : "#15803D",
+                    ? colors.danger
+                    : colors.successText,
             },
           ]}
         >
@@ -88,7 +97,7 @@ export default function CalendarDaySheetContent({ summary, dateStr }: Props) {
 
         {worstCat ? (
           <View style={localStyles.heroFooterCallout}>
-            <Ionicons name="trending-up" size={18} color="#C62828" />
+            <Ionicons name="trending-up" size={18} color={colors.dangerText} />
             <View style={styles.insightCalloutBody}>
               <Text style={styles.insightCalloutLabel}>Largest gap today</Text>
               <Text style={styles.insightCalloutValue} numberOfLines={2}>
@@ -133,7 +142,7 @@ export default function CalendarDaySheetContent({ summary, dateStr }: Props) {
       {!hasBudg && totalSpent > 0 ? (
         <View style={styles.listBlock}>
           <View style={localStyles.infoRow}>
-            <Ionicons name="information-circle" size={18} color="#6B7280" />
+            <Ionicons name="information-circle" size={18} color={colors.textMuted} />
             <Text style={styles.sectionHint}>
               Set monthly budgets in Activity → Categories to see daily targets
               here.
@@ -173,11 +182,11 @@ export default function CalendarDaySheetContent({ summary, dateStr }: Props) {
                 : 0;
             const spentColor =
               row.isOver
-                ? "#FF3B30"
+                ? colors.danger
                 : row.spent <= 0
-                  ? "#111827"
-                  : "#34C759";
-            const barColor = row.isOver ? "#FF3B30" : "#34C759";
+                  ? colors.textPrimary
+                  : colors.success;
+            const barColor = row.isOver ? colors.danger : colors.success;
             return (
               <View key={row.slug} style={styles.catBlock}>
                 <View style={styles.catBlockTop}>
@@ -214,9 +223,14 @@ export default function CalendarDaySheetContent({ summary, dateStr }: Props) {
             <View style={[styles.catBlock, localStyles.catBlockLast]}>
               <View style={styles.catBlockTop}>
                 <View style={styles.catLeft}>
-                  <View style={[styles.catDot, { backgroundColor: "#9CA3AF" }]} />
+                  <View
+                    style={[
+                      styles.catDot,
+                      { backgroundColor: colors.textPlaceholder },
+                    ]}
+                  />
                   <View style={{ flex: 1, minWidth: 0 }}>
-                    <Text style={[styles.catName, { color: "#6B7280" }]}>
+                    <Text style={[styles.catName, { color: colors.textMuted }]}>
                       Other spend
                     </Text>
                     <Text style={localStyles.catSubLabel}>
@@ -224,7 +238,7 @@ export default function CalendarDaySheetContent({ summary, dateStr }: Props) {
                     </Text>
                   </View>
                 </View>
-                <Text style={[styles.catAmount, { color: "#6B7280" }]}>
+                <Text style={[styles.catAmount, { color: colors.textMuted }]}>
                   {formatMoney(unbudgetedTotal)}
                 </Text>
               </View>
@@ -248,7 +262,7 @@ const localStyles = StyleSheet.create({
     paddingTop: 12,
     marginTop: 4,
     borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: "#D1D5DB",
+    borderTopColor: colors.borderStrong,
   },
   txnRowFirst: { borderTopWidth: 0 },
   infoRow: {
@@ -261,10 +275,10 @@ const localStyles = StyleSheet.create({
     paddingBottom: 0,
   },
   catSubLabel: {
-    fontSize: 11,
-    color: "#9CA3AF",
+    fontSize: fontSize.xs,
+    color: colors.textPlaceholder,
     lineHeight: 15,
     marginTop: 2,
-    fontWeight: "500",
+    fontWeight: fontWeight.medium,
   },
 });

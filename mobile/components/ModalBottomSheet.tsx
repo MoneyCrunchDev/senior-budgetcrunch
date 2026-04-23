@@ -2,6 +2,8 @@ import BottomSheet, { BottomSheetBackdrop } from '@gorhom/bottom-sheet';
 import React, { forwardRef } from 'react';
 import { StyleSheet, View } from 'react-native';
 
+import { colors, radius, spacing } from '@/theme';
+
 export type ModalBottomSheetProps = {
   /** Snap points (e.g. [320] or [0.35 * height]). Controls sheet height. */
   snapPoints: (string | number)[];
@@ -67,19 +69,19 @@ const styles = StyleSheet.create({
     elevation: 1000,
   },
   background: {
-    backgroundColor: 'white',
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
+    backgroundColor: colors.surface,
+    borderTopLeftRadius: radius.xxl,
+    borderTopRightRadius: radius.xxl,
   },
   handle: {
     width: 40,
-    backgroundColor: '#C7C7CC',
+    backgroundColor: colors.sheetHandle,
   },
   content: {
     flex: 1,
-    paddingHorizontal: 24,
-    paddingTop: 8,
-    paddingBottom: 24,
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.xs,
+    paddingBottom: spacing.lg,
   },
 });
 

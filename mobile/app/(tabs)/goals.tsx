@@ -10,7 +10,7 @@ import {
   Alert,
 } from "react-native";
 
-const GRID = 8;
+import { colors, fontSize, fontWeight, radius, spacing } from "@/theme";
 
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
 const MS_PER_WEEK = 7 * MS_PER_DAY;
@@ -28,9 +28,9 @@ const PACE_BEHIND_RED_EXTRA_WEEKS = 12;
 type PaceBarTone = "green" | "yellow" | "red";
 
 const PACE_BAR_COLORS: Record<PaceBarTone, string> = {
-  green: "#2ECC71",
-  yellow: "#E6B325",
-  red: "#E53935",
+  green: colors.success,
+  yellow: colors.warning,
+  red: colors.danger,
 };
 
 /** Slower than planned → yellow; much slower (ratio or slip) → red. */
@@ -638,7 +638,7 @@ export default function Screen() {
 
   return (
     <>
-      <ScrollView contentContainerStyle={styles.container}>
+      <ScrollView style={styles.scroll} contentContainerStyle={styles.container}>
         <View style={styles.header}>
           <View style={styles.headerLeft}>
             <TouchableOpacity
@@ -717,7 +717,7 @@ export default function Screen() {
           </View>
         )}
 
-        <View style={{ height: GRID * 3 }} />
+        <View style={{ height: spacing.lg }} />
       </ScrollView>
 
       <Modal
@@ -736,7 +736,7 @@ export default function Screen() {
               onChangeText={setNewTitle}
               placeholder="Ex: New Car"
               style={styles.modalInput}
-              placeholderTextColor="#9AA2AF"
+              placeholderTextColor={colors.textPlaceholder}
             />
 
             <Text style={styles.modalLabel}>Choose an Icon</Text>
@@ -766,7 +766,7 @@ export default function Screen() {
               placeholder="5000"
               keyboardType="numeric"
               style={styles.modalInput}
-              placeholderTextColor="#9AA2AF"
+              placeholderTextColor={colors.textPlaceholder}
             />
 
             <Text style={styles.modalLabel}>Weeks Estimate</Text>
@@ -776,7 +776,7 @@ export default function Screen() {
               placeholder="12"
               keyboardType="numeric"
               style={styles.modalInput}
-              placeholderTextColor="#9AA2AF"
+              placeholderTextColor={colors.textPlaceholder}
             />
 
             <View style={styles.modalActions}>
@@ -815,7 +815,7 @@ export default function Screen() {
               placeholder="Ex: 375"
               keyboardType="numeric"
               style={styles.modalInput}
-              placeholderTextColor="#9AA2AF"
+              placeholderTextColor={colors.textPlaceholder}
             />
 
             <View style={styles.modalActions}>
@@ -845,151 +845,156 @@ export default function Screen() {
 }
 
 const styles = StyleSheet.create({
+  scroll: {
+    flex: 1,
+    backgroundColor: colors.screenBackground,
+  },
   container: {
-    paddingHorizontal: GRID * 2,
-    paddingTop: GRID * 6,
-    backgroundColor: "#F6F7F9",
+    flexGrow: 1,
+    paddingHorizontal: spacing.md,
+    paddingTop: spacing.xxxl,
+    backgroundColor: colors.screenBackground,
   },
 
   header: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: GRID * 2,
+    marginBottom: spacing.md,
   },
 
   headerLeft: {
     flexDirection: "row",
-    gap: GRID,
+    gap: spacing.xs,
   },
 
   iconButton: {
-    width: GRID * 5,
-    height: GRID * 5,
-    borderRadius: GRID * 2.5,
-    backgroundColor: "#FFFFFF",
+    width: spacing.xxl,
+    height: spacing.xxl,
+    borderRadius: spacing.xxl / 2,
+    backgroundColor: colors.surface,
     borderWidth: 1,
-    borderColor: "#E6E8EC",
+    borderColor: colors.border,
     alignItems: "center",
     justifyContent: "center",
   },
 
   iconButtonDanger: {
-    backgroundColor: "#FFF1F1",
-    borderColor: "#F3C1C1",
+    backgroundColor: colors.dangerSoft,
+    borderColor: colors.dangerBorder,
   },
 
   iconButtonText: {
     fontSize: 22,
-    fontWeight: "700",
+    fontWeight: fontWeight.bold,
     lineHeight: 22,
-    color: "#111",
+    color: colors.textPrimary,
   },
 
   iconButtonDangerText: {
-    color: "#C62828",
+    color: colors.dangerText,
   },
 
   headerTitle: {
     flex: 1,
     textAlign: "center",
-    fontSize: 24,
-    fontWeight: "800",
-    color: "#111",
+    fontSize: fontSize.display,
+    fontWeight: fontWeight.extrabold,
+    color: colors.textPrimary,
   },
 
   headerRight: {
     flexDirection: "row",
-    gap: GRID,
+    gap: spacing.xs,
   },
 
   smallButton: {
-    height: GRID * 5,
-    paddingHorizontal: GRID * 2,
-    borderRadius: GRID,
-    backgroundColor: "#FFFFFF",
+    height: spacing.xxl,
+    paddingHorizontal: spacing.md,
+    borderRadius: radius.md,
+    backgroundColor: colors.surface,
     borderWidth: 1,
-    borderColor: "#E6E8EC",
+    borderColor: colors.border,
     alignItems: "center",
     justifyContent: "center",
   },
 
   smallButtonText: {
-    fontSize: 14,
-    fontWeight: "700",
-    color: "#111",
+    fontSize: fontSize.base,
+    fontWeight: fontWeight.bold,
+    color: colors.textPrimary,
   },
 
   headerStatusRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginBottom: GRID * 2,
+    marginBottom: spacing.md,
   },
 
   headerStatusText: {
-    fontSize: 12,
-    fontWeight: "700",
-    color: "#6B7280",
+    fontSize: fontSize.sm,
+    fontWeight: fontWeight.bold,
+    color: colors.textMuted,
     textTransform: "capitalize",
   },
 
   deleteModeBanner: {
-    marginBottom: GRID * 2,
-    paddingVertical: GRID * 1.5,
-    paddingHorizontal: GRID * 2,
-    borderRadius: GRID,
-    backgroundColor: "#FFF1F1",
+    marginBottom: spacing.md,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.md,
+    borderRadius: radius.md,
+    backgroundColor: colors.dangerSoft,
     borderWidth: 1,
-    borderColor: "#F3C1C1",
+    borderColor: colors.dangerBorder,
   },
 
   deleteModeBannerText: {
     fontSize: 13,
-    fontWeight: "700",
-    color: "#C62828",
+    fontWeight: fontWeight.bold,
+    color: colors.dangerText,
   },
 
   list: {
-    gap: GRID * 2,
+    gap: spacing.md,
   },
 
   card: {
-    backgroundColor: "#FFFFFF",
-    borderRadius: GRID * 1.5,
+    backgroundColor: colors.surface,
+    borderRadius: radius.lg,
     borderWidth: 1,
-    borderColor: "#E6E8EC",
+    borderColor: colors.border,
     overflow: "hidden",
   },
 
   cardDeleteMode: {
-    borderColor: "#F3C1C1",
+    borderColor: colors.dangerBorder,
   },
 
   row: {
-    padding: GRID * 2,
+    padding: spacing.md,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    gap: GRID * 2,
+    gap: spacing.md,
   },
 
   rowLeft: {
     flexDirection: "row",
     alignItems: "center",
     flex: 1,
-    gap: GRID * 1.5,
+    gap: spacing.sm,
   },
 
   iconCircle: {
-    width: GRID * 5,
-    height: GRID * 5,
-    borderRadius: GRID * 2.5,
-    backgroundColor: "#F2F4F7",
+    width: spacing.xxl,
+    height: spacing.xxl,
+    borderRadius: spacing.xxl / 2,
+    backgroundColor: colors.surfaceMuted,
     alignItems: "center",
     justifyContent: "center",
   },
 
   iconText: {
-    fontSize: 18,
+    fontSize: fontSize.xl,
   },
 
   rowMain: {
@@ -998,119 +1003,119 @@ const styles = StyleSheet.create({
   },
 
   goalTitle: {
-    fontSize: 16,
-    fontWeight: "800",
-    color: "#111",
-    marginBottom: GRID / 2,
+    fontSize: fontSize.lg,
+    fontWeight: fontWeight.extrabold,
+    color: colors.textPrimary,
+    marginBottom: spacing.xxs,
   },
 
   goalSub: {
-    fontSize: 12,
-    fontWeight: "600",
-    color: "#6B7280",
+    fontSize: fontSize.sm,
+    fontWeight: fontWeight.semibold,
+    color: colors.textMuted,
   },
 
   rowRight: {
     alignItems: "flex-end",
-    gap: GRID,
+    gap: spacing.xs,
   },
 
   quickAddRow: {
     flexDirection: "row",
-    gap: GRID,
+    gap: spacing.xs,
   },
 
   quickBtn: {
-    height: GRID * 4,
-    paddingHorizontal: GRID * 1.5,
-    borderRadius: GRID,
+    height: spacing.xl,
+    paddingHorizontal: spacing.sm,
+    borderRadius: radius.md,
     borderWidth: 1,
-    borderColor: "#D8DCE2",
-    backgroundColor: "#FFF",
+    borderColor: colors.borderStrong,
+    backgroundColor: colors.surface,
     alignItems: "center",
     justifyContent: "center",
   },
 
   quickBtnText: {
-    fontSize: 12,
-    fontWeight: "800",
-    color: "#111",
+    fontSize: fontSize.sm,
+    fontWeight: fontWeight.extrabold,
+    color: colors.textPrimary,
   },
 
   disabledButton: {
-    backgroundColor: "#F3F4F6",
-    borderColor: "#E5E7EB",
+    backgroundColor: colors.surfaceMuted,
+    borderColor: colors.divider,
   },
 
   disabledButtonText: {
-    color: "#9CA3AF",
+    color: colors.textPlaceholder,
   },
 
   chevron: {
-    fontSize: 18,
-    color: "#6B7280",
-    fontWeight: "800",
+    fontSize: fontSize.xl,
+    color: colors.textMuted,
+    fontWeight: fontWeight.extrabold,
     lineHeight: 18,
   },
 
   alwaysVisibleProgressSection: {
-    paddingHorizontal: GRID * 2,
-    paddingBottom: GRID * 2,
-    gap: GRID,
+    paddingHorizontal: spacing.md,
+    paddingBottom: spacing.md,
+    gap: spacing.xs,
   },
 
   expanded: {
     borderTopWidth: 1,
-    borderTopColor: "#E6E8EC",
-    padding: GRID * 2,
-    gap: GRID * 2,
+    borderTopColor: colors.border,
+    padding: spacing.md,
+    gap: spacing.md,
   },
 
   estimateBlock: {
-    gap: GRID / 2,
+    gap: spacing.xxs,
   },
 
   weeksText: {
-    fontSize: 12,
-    fontWeight: "800",
-    color: "#6B7280",
+    fontSize: fontSize.sm,
+    fontWeight: fontWeight.extrabold,
+    color: colors.textMuted,
   },
 
   paceText: {
-    fontSize: 12,
-    fontWeight: "600",
-    color: "#6B7280",
+    fontSize: fontSize.sm,
+    fontWeight: fontWeight.semibold,
+    color: colors.textMuted,
   },
 
   completeBanner: {
-    backgroundColor: "#E9F9EF",
+    backgroundColor: colors.successSoft,
     borderWidth: 1,
-    borderColor: "#BFE8CA",
-    paddingVertical: GRID * 1.5,
-    paddingHorizontal: GRID * 2,
-    borderRadius: GRID,
+    borderColor: colors.successBorder,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.md,
+    borderRadius: radius.md,
   },
 
   completeBannerText: {
     fontSize: 13,
-    fontWeight: "800",
-    color: "#1F7A3D",
+    fontWeight: fontWeight.extrabold,
+    color: colors.successText,
   },
 
   progressWrap: {
-    gap: GRID,
+    gap: spacing.xs,
   },
 
   progressTrack: {
-    height: GRID * 1.5,
-    borderRadius: GRID,
-    backgroundColor: "#EEF0F3",
+    height: spacing.sm,
+    borderRadius: radius.md,
+    backgroundColor: colors.divider,
     overflow: "hidden",
   },
 
   progressFill: {
     height: "100%",
-    backgroundColor: "#2ECC71",
+    backgroundColor: colors.success,
   },
 
   progressMetaRow: {
@@ -1119,158 +1124,158 @@ const styles = StyleSheet.create({
   },
 
   progressLabel: {
-    fontSize: 12,
-    fontWeight: "800",
-    color: "#6B7280",
+    fontSize: fontSize.sm,
+    fontWeight: fontWeight.extrabold,
+    color: colors.textMuted,
   },
 
   addGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: GRID,
+    gap: spacing.xs,
   },
 
   addBtn: {
     width: "31%",
-    height: GRID * 5,
-    borderRadius: GRID,
+    height: spacing.xxl,
+    borderRadius: radius.md,
     borderWidth: 1,
-    borderColor: "#D8DCE2",
-    backgroundColor: "#FFF",
+    borderColor: colors.borderStrong,
+    backgroundColor: colors.surface,
     alignItems: "center",
     justifyContent: "center",
   },
 
   addBtnText: {
-    fontSize: 14,
-    fontWeight: "900",
-    color: "#111",
+    fontSize: fontSize.base,
+    fontWeight: fontWeight.black,
+    color: colors.textPrimary,
   },
 
   emptyState: {
-    marginTop: GRID * 2,
-    padding: GRID * 3,
-    borderRadius: GRID * 1.5,
-    backgroundColor: "#FFFFFF",
+    marginTop: spacing.md,
+    padding: spacing.lg,
+    borderRadius: radius.lg,
+    backgroundColor: colors.surface,
     borderWidth: 1,
-    borderColor: "#E6E8EC",
+    borderColor: colors.border,
     alignItems: "center",
   },
 
   emptyStateTitle: {
-    fontSize: 16,
-    fontWeight: "800",
-    color: "#111",
-    marginBottom: GRID,
+    fontSize: fontSize.lg,
+    fontWeight: fontWeight.extrabold,
+    color: colors.textPrimary,
+    marginBottom: spacing.xs,
   },
 
   emptyStateSub: {
     fontSize: 13,
-    fontWeight: "600",
-    color: "#6B7280",
+    fontWeight: fontWeight.semibold,
+    color: colors.textMuted,
     textAlign: "center",
   },
 
   modalOverlay: {
     flex: 1,
-    backgroundColor: "rgba(0,0,0,0.35)",
+    backgroundColor: colors.overlaySoft,
     justifyContent: "center",
-    padding: GRID * 2,
+    padding: spacing.md,
   },
 
   modalCard: {
-    backgroundColor: "#FFFFFF",
-    borderRadius: GRID * 2,
-    padding: GRID * 3,
+    backgroundColor: colors.surface,
+    borderRadius: radius.xl,
+    padding: spacing.lg,
   },
 
   modalTitle: {
-    fontSize: 20,
-    fontWeight: "800",
-    color: "#111",
-    marginBottom: GRID * 2,
+    fontSize: fontSize.xxl,
+    fontWeight: fontWeight.extrabold,
+    color: colors.textPrimary,
+    marginBottom: spacing.md,
   },
 
   modalLabel: {
     fontSize: 13,
-    fontWeight: "700",
-    color: "#444",
-    marginBottom: GRID,
-    marginTop: GRID,
+    fontWeight: fontWeight.bold,
+    color: colors.textSecondary,
+    marginBottom: spacing.xs,
+    marginTop: spacing.xs,
   },
 
   modalInput: {
-    height: GRID * 6,
+    height: spacing.xxxl,
     borderWidth: 1,
-    borderColor: "#D8DCE2",
-    borderRadius: GRID,
-    paddingHorizontal: GRID * 1.5,
-    fontSize: 16,
-    color: "#111",
-    backgroundColor: "#FFF",
+    borderColor: colors.borderStrong,
+    borderRadius: radius.md,
+    paddingHorizontal: spacing.sm,
+    fontSize: fontSize.lg,
+    color: colors.textPrimary,
+    backgroundColor: colors.surface,
   },
 
   iconPickerGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: GRID,
-    marginBottom: GRID,
+    gap: spacing.xs,
+    marginBottom: spacing.xs,
   },
 
   iconPickerButton: {
-    width: GRID * 6,
-    height: GRID * 6,
-    borderRadius: GRID,
+    width: spacing.xxxl,
+    height: spacing.xxxl,
+    borderRadius: radius.md,
     borderWidth: 1,
-    borderColor: "#D8DCE2",
-    backgroundColor: "#FFF",
+    borderColor: colors.borderStrong,
+    backgroundColor: colors.surface,
     alignItems: "center",
     justifyContent: "center",
   },
 
   iconPickerButtonSelected: {
-    borderColor: "#111",
-    backgroundColor: "#F3F4F6",
+    borderColor: colors.primary,
+    backgroundColor: colors.surfaceMuted,
   },
 
   iconPickerText: {
-    fontSize: 24,
+    fontSize: fontSize.display,
   },
 
   modalActions: {
     flexDirection: "row",
     justifyContent: "flex-end",
-    gap: GRID,
-    marginTop: GRID * 3,
+    gap: spacing.xs,
+    marginTop: spacing.lg,
   },
 
   modalSecondaryButton: {
-    height: GRID * 5,
-    paddingHorizontal: GRID * 2,
-    borderRadius: GRID,
-    backgroundColor: "#F3F4F6",
+    height: spacing.xxl,
+    paddingHorizontal: spacing.md,
+    borderRadius: radius.md,
+    backgroundColor: colors.surfaceMuted,
     alignItems: "center",
     justifyContent: "center",
   },
 
   modalSecondaryButtonText: {
-    fontSize: 14,
-    fontWeight: "700",
-    color: "#111",
+    fontSize: fontSize.base,
+    fontWeight: fontWeight.bold,
+    color: colors.textPrimary,
   },
 
   modalPrimaryButton: {
-    height: GRID * 5,
-    paddingHorizontal: GRID * 2,
-    borderRadius: GRID,
-    backgroundColor: "#111",
+    height: spacing.xxl,
+    paddingHorizontal: spacing.md,
+    borderRadius: radius.md,
+    backgroundColor: colors.primary,
     alignItems: "center",
     justifyContent: "center",
   },
 
   modalPrimaryButtonText: {
-    fontSize: 14,
-    fontWeight: "700",
-    color: "#FFF",
+    fontSize: fontSize.base,
+    fontWeight: fontWeight.bold,
+    color: colors.textOnPrimary,
   },
 });
