@@ -43,7 +43,7 @@ if (token) Mapbox.setAccessToken(token);
  */
 const MAP_STYLE_URL =
   process.env.EXPO_PUBLIC_MAPBOX_STYLE_URL?.trim() ||
-  "mapbox://styles/mapbox/streets-v12";
+  "mapbox://styles/itsbryanhdz/cmm4g3wwj00fx01s53plh8w4r";
 
 /** Fallback map center when we don't have permission or location (US center). */
 const DEFAULT_CENTER: [number, number] = [-98, 39];
